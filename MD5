@@ -1,0 +1,17 @@
+50852d4d55b595ee53a5a984113b73c5 *DESCRIPTION
+fea48d3453d94ca7d8010c9455ac86a8 *NAMESPACE
+2376fbb9d918a1aa4661f9915e37ccb1 *R/ci.plot.R
+67887e5456514f1d72fc80f25633f688 *R/create.tab.R
+ef4b2023ffeb49e1873f54bea2448161 *R/nma.ab.R
+6ffa10aca3c3ddfea20032db0bbd90b6 *R/nma.networkplot.R
+4daf7d84242ecd97f7f6ad4fec407228 *data/Ara09.rda
+6d000e59ffbb92dc5d2162a371501fe0 *data/Lam07.Summary.rda
+0fb968ed55327c1afa293f84c42e09af *data/Lam07.rda
+15bfef5c2eded599804e60f1d67bd3cf *man/Ara09.Rd
+fbdfdd2b2eb0dc80b957a6c2505238b3 *man/Lam07.Rd
+26c0ca4ad433a6a9302ccf2827db0963 *man/Lam07.Summary.Rd
+d024f4a6618aa4b97ee11ca6dc551101 *man/ci.plot.Rd
+b35c5da4236941e1ad5b11ea910e0a0f *man/create.tab.Rd
+404b9b99cda88b63ce739fd9e34b884d *man/nma.ab.Rd
+13e64093c72f4bc8b49ecc41aaf34961 *man/nma.networkplot.Rd
+dd24a48894695c4bee0b05ec3b8cb1f1 *man/pcnetmeta-package.Rd
