@@ -108,6 +108,6 @@ function(c1,c2,percomparison,trtname,weight=FALSE,VAR1,graphtitle,thickness,node
 
   if(weight) wt_label<-mat_treat else wt_label<-NULL
   ## plot of the network
-  plot(netdata,mode="circle",displaylabels=TRUE,vertex.cex=nodethickness,edge.col="skyblue2",boxed.label=FALSE,edge.lwd=mat_treat_new,edge.label=wt_label)
-  title(main=list(pltitle,col="blue",font=2))
+  plot(netdata,mode="circle",displaylabels=TRUE,vertex.cex=nodethickness,edge.col="skyblue2",vertex.col="green",boxed.label=FALSE,edge.lwd=mat_treat_new,edge.label=wt_label)
+  title(main=list(pltitle,font=2))
 }

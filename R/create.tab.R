@@ -37,22 +37,23 @@ function(summary.stat,type="CI",compare=1,f.name="",trtname,order=TRUE,o.path=ge
   }
   sm<-list(list(t.RR,t.RD),list(t.RD,t.RR),list(t.RR,t.OR),list(t.OR,t.RR),list(t.RD,t.OR),list(t.OR,t.RD))
 
-  if(missing(trtname)){
-    trtname<-paste("treat",1:n.tr,sep="")}else{
-      if(length(trtname)!=n.tr) stop("the length of trtname is not equal to treatment number.")
-    }
-
   ## create table
   setwd(o.path)
-
+  trtids<-row.names(summary.stat)[grep("probt",row.names(summary.stat))]
+  trtids<-gsub("probt\\[","",trtids)
+  trtids<-as.numeric(gsub("\\]","",trtids))
+  orders<-order(trtids)
+  sorted<-sort(trtids)
+  if(missing(trtname)){
+    trtname<-paste("treat",sorted,sep="")}else{
+      if(length(trtname)!=n.tr) stop("the length of trtname is not equal to treatment number.")
+    }
   for(i in 1:n.tr){
     for(j in 1:n.tr){
-      if(i==j) o.table[i,j]<-t.probt[i]
-      if(i<j) o.table[i,j]<-sm[[compare]][[1]][which(nm[[compare]][[1]]==paste(cm[compare,1],"[",ifelse(order,min(c(i,j)),max(c(i,j))),",",ifelse(order,max(c(i,j)),min(c(i,j))),"]",sep=""))]
-      if(i>j) o.table[i,j]<-sm[[compare]][[2]][which(nm[[compare]][[2]]==paste(cm[compare,2],"[",ifelse(order,min(c(i,j)),max(c(i,j))),",",ifelse(order,max(c(i,j)),min(c(i,j))),"]",sep=""))]
+      if(i==j) o.table[i,j]<-t.probt[orders[i]]
+      if(i<j) o.table[i,j]<-sm[[compare]][[1]][which(nm[[compare]][[1]]==paste(cm[compare,1],"[",ifelse(order,min(c(sorted[i],sorted[j])),max(c(sorted[i],sorted[j]))),",",ifelse(order,max(c(sorted[i],sorted[j])),min(c(sorted[i],sorted[j]))),"]",sep=""))]
+      if(i>j) o.table[i,j]<-sm[[compare]][[2]][which(nm[[compare]][[2]]==paste(cm[compare,2],"[",ifelse(order,min(c(sorted[i],sorted[j])),max(c(sorted[i],sorted[j]))),",",ifelse(order,max(c(sorted[i],sorted[j])),min(c(sorted[i],sorted[j]))),"]",sep=""))]
     }
   }
-
   write.table(o.table,file=paste(f.name,cm[compare,1],"-",cm[compare,2],"-",type,"-table.txt",sep=""),row.names=trtname,col.names=trtname)
-
 }

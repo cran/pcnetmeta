@@ -1,14 +1,20 @@
 ci.plot <-
 function(summary.stat,trtname,graphtitle=""){
-  par(tck=-0.02,mgp=c(1.5,0.5,0),mar=c(5,4,1,4),cex=0.85)
+  par(tck=-0.02,mgp=c(1.5,0.5,0),mar=c(3,4,1,4),cex=0.85)
   ## set parameters
   r.probt<-grep("probt",row.names(summary.stat))
+  trtids<-row.names(summary.stat)[grep("probt",row.names(summary.stat))]
+  trtids<-gsub("probt\\[","",trtids)
+  trtids<-as.numeric(gsub("\\]","",trtids))
+  orders<-order(trtids)
+  sorted<-sort(trtids)
+  r.probt<-r.probt[orders]
   n.tr<-length(r.probt)
   xx<-1:n.tr
 
   ## set default arguments
   if(missing(trtname)){
-    trtname<-paste("trt",1:n.tr,sep="")}else{
+    trtname<-paste("trt",sorted,sep="")}else{
       if(length(trtname)!=n.tr) stop("the length of trtname is not equal to treatment number.")
     }
 

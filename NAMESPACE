@@ -1,3 +1,3 @@
 exportPattern("^[[:alpha:]]+")
 
-import(R2jags, network)
+import(R2jags, network, runjags)
