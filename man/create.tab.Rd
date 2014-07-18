@@ -37,7 +37,7 @@ create.tab(summary.stat, type = "CI", compare = 1, f.name = "", trtname,
 A file containing a summary table for treatment comparisons, with diagonal elements being population-averaged event rates and off-diagonal elements being RRs, RDs, or ORs with their credible intervals or standard errors.
 }
 \references{
-Zhang J, Carlin BP, Neaton JD, Soon GG, Nie L, Kane R, Virnig BA, Chu H (2013). "Network meta-analysis of randomized clinical trials: Reporting the proper summaries." \emph{Clin Trials}.
+Zhang J, Carlin BP, Neaton JD, Soon GG, Nie L, Kane R, Virnig BA, Chu H (2014). "Network meta-analysis of randomized clinical trials: Reporting the proper summaries." \emph{Clin Trials} \bold{11}(2), 246--262.
 }
 \author{
 Lifeng Lin, Jing Zhang, and Haitao Chu.
@@ -45,19 +45,13 @@ Lifeng Lin, Jing Zhang, and Haitao Chu.
 
 
 \examples{
-## summary RR-RD table for network Ara 2009
-data(Ara09)
-attach(Ara09)
+## summary RR-RD table for network Middleton 2010
+data(Middleton10)
+attach(Middleton10)
 set.seed(12345)
-nma.ab(s.id = Study.ID, t.id = Treatment, event.n = r, total.n = n,
-       f.name = "Ara09_", n.iter = 500, dic = FALSE)
-detach(Ara09)
-create.tab(summary.stat = read.table("Ara09_Summary.stat", header = TRUE),
-           type = "SE", f.name = "Ara09-")
-
-## summary RR-RO table for network Lam 2007
-data(Lam07.Summary)
-data(Lam07)
-create.tab(summary.stat = Lam07.Summary, compare = 3, f.name = "Lam07-",
-           trtname = Lam07$trtname, order = FALSE)
+nma.ab(s.id = sid, t.id = tid, event.n = r, total.n = n,
+       f.name = "Middleton10_", n.iter = 500, dic = FALSE)
+detach(Middleton10)
+create.tab(summary.stat = read.table("Middleton10_Summary.stat", header = TRUE),
+           type = "CI", f.name = "Middleton10-")
 }

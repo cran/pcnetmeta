@@ -1,12 +1,11 @@
 nma.ab <-
-function(s.id,t.id,event.n,total.n,o.path=getwd(),f.name="",model="het2",sigma2.a=0.001,sigma2.b=0.001,mu.prec=0.001,R,param=c("probt","RR","RD","OR","rk","best"),ity="estimate",n.iter=200000,n.burnin=floor(n.iter/2),n.chains=3,n.thin=max(1,floor((n.iter-n.burnin)/100000)),dic=TRUE,trace=FALSE,postdens=FALSE){
+function(s.id,t.id,event.n,total.n,o.path=getwd(),f.name="",model="het1",sigma2.a=0.001,sigma2.b=0.001,mu.prec=0.001,R,param=c("probt","RR","RD","OR","rk","best"),trtname,n.iter=200000,n.burnin=floor(n.iter/2),n.chains=2,n.thin=max(1,floor((n.iter-n.burnin)/100000)),dic=TRUE,trace=FALSE,postdens=FALSE){
   ## check the input parameters
   options(warn=1)
   if(missing(s.id)) stop("need to specify study id.")
   if(missing(t.id)) stop("need to specify treatment.")
   if(missing(event.n)) stop("need to specify event number.")
   if(missing(total.n)) stop("need to specify total number.")
-  if(ity!="same" & ity!="estimate") stop("initial value type (ity) must be set as \"same\" or \"estimate\".")
   if(length(s.id)!=length(t.id) | length(t.id)!=length(event.n) | length(event.n)!=length(total.n) | length(total.n)!=length(s.id)){
     stop("the data input do not have the same length.")
   }
@@ -29,6 +28,9 @@ function(s.id,t.id,event.n,total.n,o.path=getwd(),f.name="",model="het2",sigma2.
   for(i in 1:tS) {s.id[which(s.id.o==s.label[i])]<-i}
   t.id<-numeric(sN)
   for(i in 1:tN) {t.id[which(t.id.o==t.label[i])]<-i}
+
+  if(missing(trtname)) trtname<-paste("Treatment",t.label)
+  if(length(trtname)!=length(unique(t.id))) stop("the number of treatment names does not match for specified treatment id.")
 
   ## jags codes
   setwd(o.path)
@@ -114,30 +116,60 @@ function(s.id,t.id,event.n,total.n,o.path=getwd(),f.name="",model="het2",sigma2.
     if(missing(R)) R<-matrix(0.005,ncol=tN,nrow=tN)+diag(1-0.005,ncol=tN,nrow=tN)
   }
 
-  ## run jags
+  ## jags data
   if(is.element(model,c("hom","het1"))) data.jags<-list(s=s.id,t=t.id,r=event.n,totaln=total.n,sN=sN,tS=tS,tN=tN,sigma2.a=sigma2.a,sigma2.b=sigma2.b,mu.prec=mu.prec)
   if(model=="het2") data.jags<-list(s=s.id,t=t.id,r=event.n,totaln=total.n,sN=sN,tS=tS,tN=tN,mn=rep(0,tN),R=R,mu.prec=mu.prec)
-  if(ity=="same") init.jags<-function(){list(mu=rep(0,tN))} else{
-      init<-NULL
-      for(trt in 1:tN){
-        init<-c(init,sum(event.n[t.id==trt])/sum(total.n[t.id==trt]))
-      }
-      init.jags<-function(){list(mu=qnorm(init))}
-    }
-
-  jags.result<-jags(data=data.jags,inits=init.jags,parameters.to.save=param,model.file="jags-model.txt",n.chains=n.chains,n.iter=n.iter,n.burnin=n.burnin,n.thin=n.thin,DIC=dic)
-  gc()
-  summary.stat<-signif(jags.result$BUGSoutput$summary[,1:7],4)
-  gc()
-  rnames<-rownames(summary.stat)
-  delete<-NULL
-  for(k in 1:tN){
-   delete<-c(delete,paste("OR","[",k,",",k,"]",sep=""),
-                    paste("RD","[",k,",",k,"]",sep=""),
-                    paste("RR","[",k,",",k,"]",sep=""))
+  ## jags initial value
+  init<-NULL
+  for(trt in 1:tN){
+    init<-c(init,sum(event.n[t.id==trt])/sum(total.n[t.id==trt]))
   }
-  compare<-rnames %in% delete
-  smry<-summary.stat[which(compare==FALSE),]
+  init.jags<-list(NULL)
+  if(model=="hom"){
+    for(ii in 1:n.chains){
+      init.jags[[ii]]<-list(mu=qnorm(init),vi=rep(0,tS),tau=sigma2.a/sigma2.b)
+    }
+  }
+  if(model=="het1"){
+    for(ii in 1:n.chains){
+      init.jags[[ii]]<-list(mu=qnorm(init),vi=rep(0,tS),tau=rep(sigma2.a/sigma2.b,tN))
+    }
+  }
+  if(model=="het2"){
+    for(ii in 1:n.chains){
+      init.jags[[ii]]<-list(mu=qnorm(init),vi=matrix(0,tS,tN),T=tN*R)
+    }
+  }
+
+  ## jags monitor parameter
+  monitor<-param[!param %in% c("RR","RD","OR")]
+  if(is.element("RR",param)){
+    for(ii in 1:tN){
+      for(jj in 1:tN){
+        if(ii!=jj) monitor<-c(monitor,paste("RR[",ii,",",jj,"]",sep=""))
+      }
+    }
+  }
+  if(is.element("RD",param)){
+    for(ii in 1:tN){
+      for(jj in 1:tN){
+        if(ii!=jj) monitor<-c(monitor,paste("RD[",ii,",",jj,"]",sep=""))
+      }
+    }
+  }
+  if(is.element("OR",param)){
+    for(ii in 1:tN){
+      for(jj in 1:tN){
+        if(ii!=jj) monitor<-c(monitor,paste("OR[",ii,",",jj,"]",sep=""))
+      }
+    }
+  }
+
+  ## run jags
+  jags.result<-jags(data=data.jags,inits=init.jags,parameters.to.save=monitor,model.file="jags-model.txt",n.chains=n.chains,n.iter=n.iter,n.burnin=n.burnin,n.thin=n.thin,DIC=dic)
+  gc()
+  smry<-signif(jags.result$BUGSoutput$summary[,c("mean","sd","2.5%","25%","50%","75%","97.5%","Rhat")],4)
+  gc()
   temp.rnames<-rnames<-rownames(smry)
   for(i in 1:tN){
     temp.rep<-grep(paste("[",i,"]",sep=""),rnames,fixed=TRUE)
@@ -160,16 +192,16 @@ function(s.id,t.id,event.n,total.n,o.path=getwd(),f.name="",model="het2",sigma2.
   gc()
   if(trace){
     pdf(paste(f.name,"TracePlot.pdf",sep=""),width=15,height=5)
-    traceplot(jags.result,ask=FALSE,varname="probt")
+    traceplot(jags.result,ask=FALSE,varname=c("probt",param[param %in% c("RR","RD","OR")]))
     dev.off()
   }
   gc()
   if(postdens){
     mcmc<-combine.mcmc(as.mcmc(jags.result))
     mcmc<-mcmc[,grep("probt",colnames(mcmc))]
-    mcmc<-data.frame(dens=c(mcmc),lines=rep(paste("probt[",1:tN,"]",sep=""),each=dim(mcmc)[1]))
+    mcmc<-data.frame(dens=c(mcmc),lines=rep(trtname,each=dim(mcmc)[1]))
     pdf(paste(f.name,"DensPlot.pdf",sep=""))
-    print(densityplot(~dens,data=mcmc,groups=lines,plot.points=FALSE,ref=TRUE,auto.key=list(space="right"),main="Density plot for population-averaged event rate",xlab="Range",ylab="Density"))
+    print(densityplot(~dens,data=mcmc,groups=lines,plot.points=FALSE,ref=TRUE,auto.key=list(space="right"),main="Density plot for population-averaged event rate",xlab="Event Rate",ylab="Density"))
     dev.off()
   }
   unlink("jags-model.txt")

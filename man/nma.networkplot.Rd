@@ -60,21 +60,16 @@ When large values given to the \code{nodetextsize} argument (e.g., larger than 4
 }
 
 \examples{
+## pairwise comparison between elements (IDs) in two vectors
 t1 <- c(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 7, 1, 1, 1, 1, 1, 1, 3, 2, 3)
 t2 <- c(2, 3, 4, 4, 5, 5, 8, 8, 8, 8, 10, 7, 9, 9, 9, 10, 6, 6, 3, 4)
 nma.networkplot(c1 = t1, c2 = t2, percomparison = TRUE)
 
-## network plot for network Ara 2009
-data(Ara09)
-attach(Ara09)
-nma.networkplot(c1 = Study.ID, c2 = Treatment, percomparison = FALSE,
-                weight = TRUE, graphtitle = "Ara 2009")
-detach(Ara09)
-
-## network plot for network Lam 2007
-data(Lam07)
-attach(Lam07$data)
-nma.networkplot(c1 = Study.ID, c2 = Treatment, percomparison = FALSE,
-                trtname = Lam07$trtname, graphtitle = "Lam 2007")
-detach(Lam07$data)
+## network plot for network Middleton10
+data(Middleton10)
+attach(Middleton10)
+nma.networkplot(c1 = sid, c2 = tid, percomparison = FALSE,
+                weight = TRUE, graphtitle = "Middleton 2010",
+                trtname = c("FG", "H", "SG", "M"))
+detach(Middleton10)
 }

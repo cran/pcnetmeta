@@ -24,27 +24,22 @@ ci.plot(summary.stat, trtname, graphtitle = "")
 A credible interval plot for population-averaged event rate is generated. Treatment names are placed on x-axis, while the y-axis shows the lower bound, upper bound and median of credible interval.
 }
 \references{
-Zhang J, Carlin BP, Neaton JD, Soon GG, Nie L, Kane R, Virnig BA, Chu H (2013). "Network meta-analysis of randomized clinical trials: Reporting the proper summaries." \emph{Clin Trials}.
+Zhang J, Carlin BP, Neaton JD, Soon GG, Nie L, Kane R, Virnig BA, Chu H (2014). "Network meta-analysis of randomized clinical trials: Reporting the proper summaries." \emph{Clin Trials} \bold{11}(2), 246--262.
 }
 \author{
 Lifeng Lin, Jing Zhang, and Haitao Chu.
 }
 
 \examples{
-## CI plot for network Ara 2009
-data(Ara09)
-attach(Ara09)
+## CI plot for network Middleton 2010
+data(Middleton10)
+attach(Middleton10)
 set.seed(12345)
-nma.ab(s.id = Study.ID, t.id = Treatment, event.n = r, total.n = n,
-       f.name = "Ara09_", n.iter = 500, dic = FALSE)
-detach(Ara09)
-ci.plot(summary.stat = read.table("Ara09_Summary.stat", header = TRUE),
-        graphtitle = "CI plot of estimated event rate for Ara09 network")
-
-## CI plot for network Lam 2007
-data(Lam07.Summary)
-data(Lam07)
-ci.plot(summary.stat = Lam07.Summary, trtname = Lam07$trtname,
-        graphtitle = "CI plot of estimated event rate for Lam07 network")
+nma.ab(s.id = sid, t.id = tid, event.n = r, total.n = n,
+       f.name = "Middleton10_", n.iter = 500, dic = FALSE)
+detach(Middleton10)
+ci.plot(summary.stat = read.table("Middleton10_Summary.stat", header = TRUE),
+        graphtitle = "CI plot of estimated event rate for network Middleton10",
+        trtname = c("First generation", "Hysterectomy", "Second generation",
+        "Mirena"))
 }
-
