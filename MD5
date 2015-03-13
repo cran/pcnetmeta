@@ -1,5 +1,5 @@
-17be798d49de6d08659a381381c7c677 *DESCRIPTION
-609477459d3e91903f38bccfc96fe5ae *NAMESPACE
+540d94fd67e0df361a8245dbb77a6b7a *DESCRIPTION
+523bbe86bffa0a90c0aff834c396c897 *NAMESPACE
 e48e6ce010c1f18a0331aadd45e37bb0 *R/ci.plot.R
 28ec82b0c0fb564b1e991e472b1b58f0 *R/create.tab.R
 d814d4a5f770ea105304052cb49542c3 *R/nma.ab.R
@@ -8,6 +8,6 @@ a05b872798e4e4128077dbb506fdce82 *data/Middleton10.rda
 247865695e888e660da123ba7f2e7a2e *man/Middleton10.Rd
 fc8d2e731027239dc723c9c6cc54bc64 *man/ci.plot.Rd
 dddb9cb5ec68d3c6464a710b680954ad *man/create.tab.Rd
-331143a4a0d78f067ede3d58e455d9b8 *man/nma.ab.Rd
+4db5de9e84c57eb03ec055d9f8109b59 *man/nma.ab.Rd
 3cc4c3ae9d8237c967594d258ef17334 *man/nma.networkplot.Rd
-98b2d365d07b368d2d9024eba9556ae3 *man/pcnetmeta-package.Rd
+d21d8c7c04c32b3c84c93d6974672c91 *man/pcnetmeta-package.Rd

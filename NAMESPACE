@@ -1,3 +1,4 @@
 exportPattern("^[[:alpha:]]+")
 
-import(R2jags, network, runjags)
+import(R2jags, network, runjags, lattice)
+importFrom(coda, as.mcmc)

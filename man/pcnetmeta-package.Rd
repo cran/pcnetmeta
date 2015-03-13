@@ -14,7 +14,7 @@ Package: \tab pcnetmeta\cr
 Type: \tab Package\cr
 Version: \tab 1.2\cr
 Date: \tab 2014-07-18\cr
-Depends: \tab R (>= 3.0.2), R2jags, network, runjags\cr
+Depends: \tab R (>= 3.0.2), R2jags, network, runjags, lattice\cr
 License: \tab GPL (>=2)\cr
 }
 Currently, most popular approaches in network meta-analysis are contrast-based, and they focus on modeling the relative treatment effects, such as odds ratio. However, the arm-based method, proposed by Zhang et al (2014), considers modeling from the perspective of missing data analysis, and it focuses on estimating the absolute risk for each treatment. This package conducts network meta-analysis by the arm-based method, and \code{\link{nma.ab}} is the most important function, which generates summary result file containing estimated absolute risk (AR), relative risk (RR), risk difference (RD), odds ratio (OR), etc.

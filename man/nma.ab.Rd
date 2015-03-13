@@ -178,6 +178,7 @@ If there exists a treatment with all of event numbers equal to 0 or correspondin
 %% ~~objects to See Also as \code{\link{help}}, ~~~
 %%}
 \examples{
+library(lattice)
 data(Middleton10)
 attach(Middleton10)
 set.seed(12345)
