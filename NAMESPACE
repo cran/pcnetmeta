@@ -1,4 +1,3 @@
-exportPattern("^[[:alpha:]]+")
+export(ci.plot, nma.ab.cont, nma.ab.followup, nma.ab.py, nma.ab, nma.networkplot)
 
-import(R2jags, network, runjags, lattice)
-importFrom(coda, as.mcmc)
+import(rjags, coda)
