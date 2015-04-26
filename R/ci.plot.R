@@ -1,4 +1,5 @@
 ci.plot <- function(nma.obj,alphabetic=TRUE){
+ .pardefault<-par(no.readonly=TRUE)
   par(tck=-0.02,mgp=c(1.5,0.5,0),mar=c(3,4,1,4),cex=0.85)
   ## set parameters
   if(!is.null(nma.obj$AbsoluteRisk)){
@@ -9,9 +10,9 @@ ci.plot <- function(nma.obj,alphabetic=TRUE){
     ci<-nma.obj$TrtEffect$Median_CI
     armparam<-"Treatment Effect"
   }
-  if(!is.null(nma.obj$HazardRate)){
-    ci<-nma.obj$HazardRate$Median_CI
-    armparam<-"Hazard Rate"
+  if(!is.null(nma.obj$LogHazardRate)){
+    ci<-nma.obj$LogHazardRate$Median_CI
+    armparam<-"Log Hazard Rate"
   }
   n.tr<-dim(ci)[1]
   xx<-1:n.tr
@@ -43,7 +44,12 @@ ci.plot <- function(nma.obj,alphabetic=TRUE){
 
   plot(xx,med,xlim=c(0.5,n.tr+0.5),ylim=y.lim,type="n",xaxs="i",
        yaxs="i",xaxt="n",yaxt="n",lwd=2,ylab=armparam,xlab="",cex=1)
-  abline(h=seq(0,1,incr),lty=4,lwd=0.5,col="grey")
+  hlines<-seq(from=signif(min(low),1),by=incr,length.out=100)
+  hlines2<-seq(from=signif(min(low),1),by=-incr,length.out=100)
+  hlines <- c(hlines2, hlines)
+  n.digits<-ifelse(incr<=1,ceiling(-log(abs(incr))/log(10)),0)
+  hlines<-round(hlines,n.digits)
+  abline(h=hlines,lty=4,lwd=0.5,col="grey")
   for(i in 1:n.tr){
     lines(c(xx[i],xx[i]),c(low[i],upp[i]),lty=1,lwd=2,col="black")
     points(xx[i],med[i],pch=15,cex=1,col="black")
@@ -51,5 +57,6 @@ ci.plot <- function(nma.obj,alphabetic=TRUE){
     points(xx[i],upp[i],pch=8,cex=1,col="black")
   }
   axis(1,at=seq(1,n.tr,1),labels=trtname,tick=TRUE)
-  axis(2,at=seq(0,1,incr),labels=seq(0,1,incr),tick=TRUE)
+  axis(2,at=hlines,labels=hlines,tick=TRUE)
+  par(.pardefault)
 }

@@ -1,9 +1,9 @@
-model.binary.het.ind <- function(prior.type="unif",rank.prob=TRUE){
+model.binary.hom.ind <- function(prior.type="unif",rank.prob=TRUE){
 if(prior.type=="unif" & rank.prob){
 cat(
 "model{
  for(i in 1:len){
-  p[i]<-phi(mu[t[i]]+sigma[t[i]]*vi[s[i]])
+  p[i]<-phi(mu[t[i]]+sigma*vi[s[i]])
   r[i]~dbin(p[i],totaln[i])
  }
  for(j in 1:nstudy){
@@ -11,9 +11,9 @@ cat(
  }
  for(j in 1:ntrt){
   mu[j]~dnorm(0,0.001)
-  AR[j]<-phi(mu[j]/sqrt(1+pow(sigma[j],2)))
-  sigma[j]~dunif(0,c)
+  AR[j]<-phi(mu[j]/sqrt(1+pow(sigma,2)))
  }
+ sigma~dunif(0,c)
  for(j in 1:ntrt){
   for(k in 1:ntrt){
    LRR[j,k]<-log(RR[j,k])
@@ -34,7 +34,7 @@ if(prior.type=="unif" & !rank.prob){
 cat(
 "model{
  for(i in 1:len){
-  p[i]<-phi(mu[t[i]]+sigma[t[i]]*vi[s[i]])
+  p[i]<-phi(mu[t[i]]+sigma*vi[s[i]])
   r[i]~dbin(p[i],totaln[i])
  }
  for(j in 1:nstudy){
@@ -42,9 +42,9 @@ cat(
  }
  for(j in 1:ntrt){
   mu[j]~dnorm(0,0.001)
-  AR[j]<-phi(mu[j]/sqrt(1+pow(sigma[j],2)))
-  sigma[j]~dunif(0,c)
+  AR[j]<-phi(mu[j]/sqrt(1+pow(sigma,2)))
  }
+ sigma~dunif(0,c)
  for(j in 1:ntrt){
   for(k in 1:ntrt){
    LRR[j,k]<-log(RR[j,k])
@@ -61,7 +61,7 @@ if(prior.type=="invgamma" & rank.prob){
 cat(
 "model{
  for(i in 1:len){
-  p[i]<-phi(mu[t[i]]+sigma[t[i]]*vi[s[i]])
+  p[i]<-phi(mu[t[i]]+sigma*vi[s[i]])
   r[i]~dbin(p[i],totaln[i])
  }
  for(j in 1:nstudy){
@@ -69,10 +69,10 @@ cat(
  }
  for(j in 1:ntrt){
   mu[j]~dnorm(0,0.001)
-  AR[j]<-phi(mu[j]/sqrt(1+pow(sigma[j],2)))
-  sigma[j]<-1/sqrt(inv.sig.sq[j])
-  inv.sig.sq[j]~dgamma(a,b)
+  AR[j]<-phi(mu[j]/sqrt(1+1/inv.sig.sq))
  }
+ sigma<-1/sqrt(inv.sig.sq)
+ inv.sig.sq~dgamma(a,b)
  for(j in 1:ntrt){
   for(k in 1:ntrt){
    LRR[j,k]<-log(RR[j,k])
@@ -93,7 +93,7 @@ if(prior.type=="invgamma" & !rank.prob){
 cat(
 "model{
  for(i in 1:len){
-  p[i]<-phi(mu[t[i]]+sigma[t[i]]*vi[s[i]])
+  p[i]<-phi(mu[t[i]]+sigma*vi[s[i]])
   r[i]~dbin(p[i],totaln[i])
  }
  for(j in 1:nstudy){
@@ -101,10 +101,10 @@ cat(
  }
  for(j in 1:ntrt){
   mu[j]~dnorm(0,0.001)
-  AR[j]<-phi(mu[j]/sqrt(1+pow(sigma[j],2)))
-  sigma[j]<-1/sqrt(inv.sig.sq[j])
-  inv.sig.sq[j]~dgamma(a,b)
+  AR[j]<-phi(mu[j]/sqrt(1+1/inv.sig.sq))
  }
+ sigma<-1/sqrt(inv.sig.sq)
+ inv.sig.sq~dgamma(a,b)
  for(j in 1:ntrt){
   for(k in 1:ntrt){
    LRR[j,k]<-log(RR[j,k])

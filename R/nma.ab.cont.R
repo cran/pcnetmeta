@@ -1,17 +1,24 @@
 nma.ab.cont <-
-function(s.id,t.id,mean,sd,total.n,trtname,model="het_cor",prior.type,a=0.001,b=0.001,c=10,param=c("mu","diff","best"),higher.better=FALSE,digits=4,n.adapt=5000,n.iter=100000,n.burnin=floor(n.iter/2),n.chains=3,n.thin=max(1,floor((n.iter-n.burnin)/100000)),conv.diag=FALSE,trace="",dic=FALSE,postdens=FALSE){
+function(s.id,t.id,mean,sd,total.n,data,trtname,param=c("mu","diff","rank.prob"),model="het_cor",prior.type,a=0.001,b=0.001,c=10,higher.better=FALSE,digits=4,n.adapt=5000,n.iter=100000,n.burnin=floor(n.iter/2),n.chains=3,n.thin=max(1,floor((n.iter-n.burnin)/100000)),conv.diag=FALSE,trace="",dic=FALSE,postdens=FALSE){
   ## check the input parameters
   options(warn=1)
   if(missing(s.id)) stop("need to specify study id.")
   if(missing(t.id)) stop("need to specify treatment.")
   if(missing(mean) | missing(sd)) stop("need to specify mean and sd of the continuous outcomes.")
   if(missing(total.n)) stop("need to specify total number.")
+  if(!missing(data)){
+    s.id<-eval(substitute(s.id),data,parent.frame())
+    t.id<-eval(substitute(t.id),data,parent.frame())
+    mean<-eval(substitute(mean),data,parent.frame())
+    sd<-eval(substitute(sd),data,parent.frame())
+    total.n<-eval(substitute(total.n),data,parent.frame())
+  }
   if(length(s.id)!=length(t.id) | length(t.id)!=length(mean) | length(mean)!=length(sd) | length(sd)!=length(total.n) | length(total.n)!=length(s.id)){
-    stop("the data input do not have the same length.")
+    stop("s.id, t.id, mean, sd, and total.n have different lengths.")
   }
   if(!all(total.n>0)) stop("total number must be positive.")
   if(!all(total.n%%1==0)) warning("at least one event number or total number is not integer.")
-  if(!is.element(model,c("hom","het_ind","het_cor"))) stop("model should be specified as \"hom\", \"het_ind\", or \"het_cor\".")
+  if(!is.element(model,c("hom_ind","het_ind","hom_eqcor","het_eqcor","het_cor"))) stop("model should be specified as \"hom_ind\", \"het_ind\", \"hom_eqcor\", \"het_eqcor\", or \"het_cor\".")
 
   ## make ids continuous
   s.id.o<-s.id
@@ -34,28 +41,47 @@ function(s.id,t.id,mean,sd,total.n,trtname,model="het_cor",prior.type,a=0.001,b=
   if(missing(prior.type)) prior.type<-ifelse(model=="het_cor","invwishart","unif")
 
   ## jags model
-  if(model=="hom"){
-    model.cont.hom(prior.type)
+  if(model=="hom_ind"){
+    model.cont.hom.ind(prior.type,is.element("rank.prob",param))
   }
   if(model=="het_ind"){
-    model.cont.het.ind(prior.type)
+    model.cont.het.ind(prior.type,is.element("rank.prob",param))
+  }
+  if(model=="hom_eqcor"){
+    model.cont.hom.eqcor(prior.type,is.element("rank.prob",param))
+  }
+  if(model=="het_eqcor"){
+    model.cont.het.eqcor(prior.type,is.element("rank.prob",param))
   }
   if(model=="het_cor"){
     I <- diag(ntrt)
-    model.cont.het.cor(prior.type)
+    model.cont.het.cor(prior.type,is.element("rank.prob",param))
   }
 
   ## jags data
-  if(model == "hom"| model == "het_ind"){
+  if(model == "hom_ind"| model == "het_ind"){
     if(prior.type == "unif"){
-      data.jags<-list(s=s.id,t=t.id,mean=mean,sd=sd,n=total.n,len=len,nstudy=nstudy,ntrt=ntrt,c=c,higher.better=higher.better)
+      if(is.element("rank.prob",param)) data.jags<-list(s=s.id,t=t.id,mean=mean,sd=sd,n=total.n,len=len,nstudy=nstudy,ntrt=ntrt,c=c,higher.better=higher.better)
+      if(!is.element("rank.prob",param)) data.jags<-list(s=s.id,t=t.id,mean=mean,sd=sd,n=total.n,len=len,nstudy=nstudy,ntrt=ntrt,c=c)
     }
     if(prior.type == "invgamma"){
-      data.jags<-list(s=s.id,t=t.id,mean=mean,sd=sd,n=total.n,len=len,nstudy=nstudy,ntrt=ntrt,a=a,b=b,higher.better=higher.better)
+      if(is.element("rank.prob",param)) data.jags<-list(s=s.id,t=t.id,mean=mean,sd=sd,n=total.n,len=len,nstudy=nstudy,ntrt=ntrt,a=a,b=b,higher.better=higher.better)
+      if(!is.element("rank.prob",param)) data.jags<-list(s=s.id,t=t.id,mean=mean,sd=sd,n=total.n,len=len,nstudy=nstudy,ntrt=ntrt,a=a,b=b)
+    }
+  }
+  if(model == "hom_eqcor"| model == "het_eqcor"){
+    if(prior.type == "unif"){
+       if(is.element("rank.prob",param)) data.jags<-list(s=s.id,t=t.id,mean=mean,sd=sd,n=total.n,len=len,nstudy=nstudy,ntrt=ntrt,zeros=rep(0,ntrt),c=c,higher.better=higher.better)
+       if(!is.element("rank.prob",param)) data.jags<-list(s=s.id,t=t.id,mean=mean,sd=sd,n=total.n,len=len,nstudy=nstudy,ntrt=ntrt,zeros=rep(0,ntrt),c=c)
+    }
+    if(prior.type == "invgamma"){
+      if(is.element("rank.prob",param)) data.jags<-list(s=s.id,t=t.id,mean=mean,sd=sd,n=total.n,len=len,nstudy=nstudy,ntrt=ntrt,zeros=rep(0,ntrt),a=a,b=b,higher.better=higher.better)
+      if(!is.element("rank.prob",param)) data.jags<-list(s=s.id,t=t.id,mean=mean,sd=sd,n=total.n,len=len,nstudy=nstudy,ntrt=ntrt,zeros=rep(0,ntrt),a=a,b=b)
     }
   }
   if(model=="het_cor"){
-    data.jags<-list(s=s.id,t=t.id,mean=mean,sd=sd,n=total.n,len=len,nstudy=nstudy,ntrt=ntrt,zeros=rep(0,ntrt),I=I,higher.better=higher.better)
+    if(is.element("rank.prob",param)) data.jags<-list(s=s.id,t=t.id,mean=mean,sd=sd,n=total.n,len=len,nstudy=nstudy,ntrt=ntrt,zeros=rep(0,ntrt),I=I,higher.better=higher.better)
+    if(!is.element("rank.prob",param)) data.jags<-list(s=s.id,t=t.id,mean=mean,sd=sd,n=total.n,len=len,nstudy=nstudy,ntrt=ntrt,zeros=rep(0,ntrt),I=I)
   }
 
   ## jags initial value
@@ -65,7 +91,7 @@ function(s.id,t.id,mean,sd,total.n,trtname,model="het_cor",prior.type,a=0.001,b=
     mu.init[i]<-sum(mean[t.id==t.id[i]]*total.n[t.id==t.id[i]])/sum(total.n[t.id==t.id[i]])
   }
   init.jags<-list(NULL)
-  if(model=="hom"){
+  if(model=="hom_ind"){
     if(prior.type=="unif"){
       for(ii in 1:n.chains){
         init.jags[[ii]]<-list(mu=mu.init,vi=rep(0,nstudy),sigma=c/2,.RNG.name="base::Wichmann-Hill",.RNG.seed=rng.seeds[ii])
@@ -89,6 +115,30 @@ function(s.id,t.id,mean,sd,total.n,trtname,model="het_cor",prior.type,a=0.001,b=
       }
     }
   }
+  if(model=="hom_eqcor"){
+    if(prior.type=="unif"){
+      for(ii in 1:n.chains){
+        init.jags[[ii]]<-list(mu=mu.init,vi=matrix(0,nstudy,ntrt),sigma=c/2,rho=0.5,.RNG.name="base::Wichmann-Hill",.RNG.seed=rng.seeds[ii])
+      }
+    }
+    if(prior.type=="invgamma"){
+      for(ii in 1:n.chains){
+        init.jags[[ii]]<-list(mu=mu.init,vi=matrix(0,nstudy,ntrt),inv.sig.sq=a/b,rho=0.5,.RNG.name="base::Wichmann-Hill",.RNG.seed=rng.seeds[ii])
+      }
+    }
+  }
+  if(model=="het_eqcor"){
+    if(prior.type=="unif"){
+      for(ii in 1:n.chains){
+        init.jags[[ii]]<-list(mu=mu.init,vi=matrix(0,nstudy,ntrt),sigma=rep(c/2,ntrt),rho=0.5,.RNG.name="base::Wichmann-Hill",.RNG.seed=rng.seeds[ii])
+      }
+    }
+    if(prior.type=="invgamma"){
+      for(ii in 1:n.chains){
+        init.jags[[ii]]<-list(mu=mu.init,vi=matrix(0,nstudy,ntrt),inv.sig.sq=rep(a/b,ntrt),rho=0.5,.RNG.name="base::Wichmann-Hill",.RNG.seed=rng.seeds[ii])
+      }
+    }
+  }
   if(model=="het_cor"){
     for(ii in 1:n.chains){
       init.jags[[ii]]<-list(mu=mu.init,vi=matrix(0,nstudy,ntrt),T=(ntrt+1)*I,.RNG.name="base::Wichmann-Hill",.RNG.seed=rng.seeds[ii])
@@ -97,6 +147,9 @@ function(s.id,t.id,mean,sd,total.n,trtname,model="het_cor",prior.type,a=0.001,b=
 
   ## parameters to be monitored in jags
   if(!is.element("mu",param)) param<-c("mu",param)
+  if(trace!=""){
+    if(!any(is.element(trace, param))) stop("at least one effect size in argument trace is not specified in argument param.")
+  }
   monitor<-param[!is.element(param,c("diff"))]
   if(is.element("diff",param)){
     for(ii in 1:ntrt){
@@ -118,10 +171,10 @@ function(s.id,t.id,mean,sd,total.n,trtname,model="het_cor",prior.type,a=0.001,b=
 
   out<-NULL
   mu.id<-grep("mu",rownames(smry))
-  mu.stat<-array(paste(format(smry[mu.id,"Mean"],digits=digits)," (",format(smry[mu.id,"SD"],digits=digits),")",sep=""),dim=c(ntrt,1))
+  mu.stat<-array(paste(format(round(smry[mu.id,"Mean"],digits=digits),nsmall=digits)," (",format(round(smry[mu.id,"SD"],digits=digits),nsmall=digits),")",sep=""),dim=c(ntrt,1))
   colnames(mu.stat)<-"Mean (SD)"
   rownames(mu.stat)<-trtname
-  mu.quan<-array(paste(format(smry[mu.id,"50%"],digits=digits)," (",format(smry[mu.id,"2.5%"],digits=digits),", ",format(smry[mu.id,"97.5%"],digits=digits),")",sep=""),dim=c(ntrt,1))
+  mu.quan<-array(paste(format(round(smry[mu.id,"50%"],digits=digits),nsmall=digits)," (",format(round(smry[mu.id,"2.5%"],digits=digits),nsmall=digits),", ",format(round(smry[mu.id,"97.5%"],digits=digits),nsmall=digits),")",sep=""),dim=c(ntrt,1))
   colnames(mu.quan)<-"Median (95% CI)"
   rownames(mu.quan)<-trtname
   out$TrtEffect<-list(Mean_SD=noquote(mu.stat),Median_CI=noquote(mu.quan))
@@ -134,31 +187,31 @@ function(s.id,t.id,mean,sd,total.n,trtname,model="het_cor",prior.type,a=0.001,b=
       for(j in 1:ntrt){
         if(i < j){
           diff.ij<-paste("diff[",i,",",j,"]",sep="")
-          diff.stat[i,j]<-paste(format(smry[diff.ij,"Mean"],digits=digits,nsmall=digits)," (",format(smry[diff.ij,"SD"],digits=digits,nsmall=digits),")",sep="")
-          diff.stat[j,i]<-paste(format(-smry[diff.ij,"Mean"],digits=digits,nsmall=digits)," (",format(smry[diff.ij,"SD"],digits=digits,nsmall=digits),")",sep="")
-          diff.quan[i,j]<-paste(format(smry[diff.ij,"50%"],digits=digits,nsmall=digits)," (",format(smry[diff.ij,"2.5%"],digits=digits,nsmall=digits),", ",format(smry[diff.ij,"97.5%"],digits=digits,nsmall=digits),")",sep="")
-          diff.quan[j,i]<-paste(format(-smry[diff.ij,"50%"],digits=digits,nsmall=digits)," (",format(-smry[diff.ij,"97.5%"],digits=digits,nsmall=digits),", ",format(-smry[diff.ij,"2.5%"],digits=digits,nsmall=digits),")",sep="")
+          diff.stat[i,j]<-paste(format(round(smry[diff.ij,"Mean"],digits=digits),nsmall=digits)," (",format(round(smry[diff.ij,"SD"],digits=digits),nsmall=digits),")",sep="")
+          diff.stat[j,i]<-paste(format(round(-smry[diff.ij,"Mean"],digits=digits),nsmall=digits)," (",format(round(smry[diff.ij,"SD"],digits=digits),nsmall=digits),")",sep="")
+          diff.quan[i,j]<-paste(format(round(smry[diff.ij,"50%"],digits=digits),nsmall=digits)," (",format(round(smry[diff.ij,"2.5%"],digits=digits),nsmall=digits),", ",format(round(smry[diff.ij,"97.5%"],digits=digits),nsmall=digits),")",sep="")
+          diff.quan[j,i]<-paste(format(round(-smry[diff.ij,"50%"],digits=digits),nsmall=digits)," (",format(round(-smry[diff.ij,"97.5%"],digits=digits),nsmall=digits),", ",format(round(-smry[diff.ij,"2.5%"],digits=digits),nsmall=digits),")",sep="")
         }
       }
     }
     out$EffectDiff<-list(Mean_SD=noquote(diff.stat),Median_CI=noquote(diff.quan))
   }
 
-  if(is.element("best",param)){
-    best.id<-grep("best",rownames(smry))
-    best.stat<-array(format(round(smry[best.id,"Mean"],digits=digits),digits=digits),dim=c(ntrt,1))
-    colnames(best.stat)<-""
-    rownames(best.stat)<-trtname
-    out$ProbOfBestTrt<-noquote(best.stat)
+  if(is.element("rank.prob",param)){
+    rank.prob.id<-grep("rank.prob",rownames(smry))
+    rank.prob.stat<-array(format(round(smry[rank.prob.id,"Mean"],digits=4),nsmall=4),dim=c(ntrt,ntrt))
+    colnames(rank.prob.stat)<-paste("rank",1:ntrt,sep="")
+    rownames(rank.prob.stat)<-trtname
+    out$TrtRankProb<-noquote(rank.prob.stat)
   }
 
   if(conv.diag){
     cat("start calculating MCMC convergence diagnostic statistics...\n")
     conv.out<-gelman.diag(jags.out,multivariate=FALSE)
     conv.out<-conv.out$psrf
-    if(is.element("best",param)){
-      best.id<-grep("best",rownames(conv.out))
-      conv.out<-conv.out[-best.id,]
+    if(is.element("rank.prob",param)){
+      rank.prob.id<-grep("rank.prob",rownames(conv.out))
+      conv.out<-conv.out[-rank.prob.id,]
     }
     write.table(conv.out,"ConvergenceDiagnostic.txt",row.names=rownames(conv.out),col.names=TRUE)
   }
