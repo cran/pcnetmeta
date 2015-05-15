@@ -6,7 +6,7 @@
 Patient-Centered Network Meta-Analysis
 }
 \description{
-Provides functions to perform arm-based network meta-analysis for datasets with binary and continuous outcomes.
+Provides functions to perform arm-based network meta-analysis for datasets with binary, continuous, and count outcomes.
 }
 \details{
 Currently, much effort in network meta-analysis has been devoted to contrast-based methods, which focus on modeling the relative treatment effects, such as log odds ratio. However, in some situations, patient-centered treatment-specific parameters, such as absolute risk, are preferred. For example, when the outcome is binary, consider two scenarios comparing treatments A and B according to one-year survival rates: (i) \eqn{\pi_{A} = 0.8} vs \eqn{\pi_{B} = 0.5} and (ii) \eqn{\pi_{A} = 0.004} vs \eqn{\pi_{B} = 0.001}. Both scenarios yield an odds ratio 4.0, but patients would prefer treatment A in scenario (i) more strongly than in scenario (ii). The contrast-based network meta-analysis requires external data sources or separate modeling to estimate treatment-specific parameters.

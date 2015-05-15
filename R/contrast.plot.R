@@ -1,4 +1,4 @@
-forest.plot <- function(nma.obj,effect.size,reference,left.margin=0.5,width=10,height){
+contrast.plot <- function(nma.obj,effect.size,reference,left.margin=0.5,width=10,height){
   if(missing(nma.obj)) stop("nma.obj is not specified.")
   if(missing(effect.size)){
     if(!is.null(nma.obj$OddsRatio) | !is.null(nma.obj$LogOddsRatio)){
@@ -15,7 +15,7 @@ forest.plot <- function(nma.obj,effect.size,reference,left.margin=0.5,width=10,h
       }
     }
     if(!is.null(nma.obj$EffectDiff)) effect.size<-"diff"
-    if(!is.null(nma.obj$HazardRatio) | !is.null(nma.obj$LogHazardRatio)) effect.size<-"ratio"
+    if(!is.null(nma.obj$RateRatio) | !is.null(nma.obj$LogRateRatio)) effect.size<-"ratio"
   }
   if(effect.size=="") stop("users do not specify a relative effect size in the argument param of the function which produces nma.obj.")
   if(!is.element(effect.size,c("OR","LOR","RR","LRR","RD","diff","ratio","logratio"))) stop("the input effect size is wrong.")
@@ -95,12 +95,12 @@ forest.plot <- function(nma.obj,effect.size,reference,left.margin=0.5,width=10,h
   }
 
   if(effect.size=="ratio"){
-    if(!is.null(nma.obj$HazardRatio)){
-      ef<-nma.obj$HazardRatio$Median_CI
+    if(!is.null(nma.obj$RateRatio)){
+      ef<-nma.obj$RateRatio$Median_CI
       trans<-"id"
     }else{
-      if(!is.null(nma.obj$LogHazardRatio)){
-        ef<-nma.obj$LogHazardRatio$Median_CI
+      if(!is.null(nma.obj$LogRateRatio)){
+        ef<-nma.obj$LogRateRatio$Median_CI
         trans<-"exp"
       }else{
         stop("the specified effect size is not estimated in nma.obj.")
@@ -109,12 +109,12 @@ forest.plot <- function(nma.obj,effect.size,reference,left.margin=0.5,width=10,h
   }
 
   if(effect.size=="logratio"){
-    if(!is.null(nma.obj$LogHazardRatio)){
-      ef<-nma.obj$LogHazardRatio$Median_CI
+    if(!is.null(nma.obj$LogRateRatio)){
+      ef<-nma.obj$LogRateRatio$Median_CI
       trans<-"id"
     }else{
-      if(!is.null(nma.obj$HazardRatio)){
-        ef<-nma.obj$HazardRatio$Median_CI
+      if(!is.null(nma.obj$RateRatio)){
+        ef<-nma.obj$RateRatio$Median_CI
         trans<-"log"
       }else{
         stop("the specified effect size is not estimated in nma.obj.")
@@ -176,11 +176,11 @@ forest.plot <- function(nma.obj,effect.size,reference,left.margin=0.5,width=10,h
     nullval<-0
   }
   if(effect.size=="ratio"){
-    efname<-"Hazard Ratio"
+    efname<-"Rate Ratio"
     nullval<-1
   }
   if(effect.size=="logratio"){
-    efname<-"Log Hazard Ratio"
+    efname<-"Log Rate Ratio"
     nullval<-0
   }
 
@@ -192,7 +192,7 @@ forest.plot <- function(nma.obj,effect.size,reference,left.margin=0.5,width=10,h
   x.right<-max(upp)+rg/10
 
   if(missing(height)) height<-ntrt-1
-  pdf(paste("ForestPlot_",effect.size,".pdf",sep=""),width=width,height=height)
+  pdf(paste("ContrastPlot_",effect.size,".pdf",sep=""),width=width,height=height)
   par(mar=c(4.1,max(nchar(contrast.name))*left.margin,1,1))
   plot(c(low,upp),rep(rev(1:(ntrt-1)),2),xlim=c(x.left,x.right),ylim=c(0.8,ntrt-1),frame.plot=FALSE,xaxt="n",yaxt="n",xlab=efname,ylab="",cex=0.1,col="white")
   points(med,rev(1:(ntrt-1)),pch=15)

@@ -1,5 +1,5 @@
 nma.ab.cont <-
-function(s.id,t.id,mean,sd,total.n,data,trtname,param=c("mu","diff","rank.prob"),model="het_cor",prior.type,a=0.001,b=0.001,c=10,higher.better=FALSE,digits=4,n.adapt=5000,n.iter=100000,n.burnin=floor(n.iter/2),n.chains=3,n.thin=max(1,floor((n.iter-n.burnin)/100000)),conv.diag=FALSE,trace="",dic=FALSE,postdens=FALSE){
+function(s.id,t.id,mean,sd,total.n,data,trtname,param=c("mu","diff","rank.prob"),model="het_cor",prior.type,a=0.001,b=0.001,c=10,higher.better=FALSE,digits=4,n.adapt=5000,n.iter=100000,n.burnin=floor(n.iter/2),n.chains=3,n.thin=max(1,floor((n.iter-n.burnin)/100000)),conv.diag=FALSE,trace="",dic=FALSE,postdens=FALSE,mcmc.samples=FALSE){
   ## check the input parameters
   options(warn=1)
   if(missing(s.id)) stop("need to specify study id.")
@@ -42,20 +42,20 @@ function(s.id,t.id,mean,sd,total.n,data,trtname,param=c("mu","diff","rank.prob")
 
   ## jags model
   if(model=="hom_ind"){
-    model.cont.hom.ind(prior.type,is.element("rank.prob",param))
+    modelstring<-model.cont.hom.ind(prior.type,is.element("rank.prob",param))
   }
   if(model=="het_ind"){
-    model.cont.het.ind(prior.type,is.element("rank.prob",param))
+    modelstring<-model.cont.het.ind(prior.type,is.element("rank.prob",param))
   }
   if(model=="hom_eqcor"){
-    model.cont.hom.eqcor(prior.type,is.element("rank.prob",param))
+    modelstring<-model.cont.hom.eqcor(prior.type,is.element("rank.prob",param))
   }
   if(model=="het_eqcor"){
-    model.cont.het.eqcor(prior.type,is.element("rank.prob",param))
+    modelstring<-model.cont.het.eqcor(prior.type,is.element("rank.prob",param))
   }
   if(model=="het_cor"){
     I <- diag(ntrt)
-    model.cont.het.cor(prior.type,is.element("rank.prob",param))
+    modelstring<-model.cont.het.cor(prior.type,is.element("rank.prob",param))
   }
 
   ## jags data
@@ -161,8 +161,7 @@ function(s.id,t.id,mean,sd,total.n,data,trtname,param=c("mu","diff","rank.prob")
 
   ## run jags
   cat("start running MCMC...\n")
-  jags.m<-jags.model(file="tempmodel.txt",data=data.jags,inits=init.jags,n.chains=n.chains,n.adapt=n.adapt)
-  unlink("tempmodel.txt")
+  jags.m<-jags.model(file=textConnection(modelstring),data=data.jags,inits=init.jags,n.chains=n.chains,n.adapt=n.adapt)
   update(jags.m,n.iter=n.burnin)
   jags.out<-coda.samples(model=jags.m,variable.names=monitor,n.iter=n.iter,thin=n.thin)
   smry<-summary(jags.out)
@@ -223,9 +222,13 @@ function(s.id,t.id,mean,sd,total.n,data,trtname,param=c("mu","diff","rank.prob")
     pen<-sum(dic.out$penalty)
     pen.dev<-dev+pen
     dic.stat<-rbind(dev,pen,pen.dev)
-    rownames(dic.stat)<-c("Mean deviance","Penalty","Penalized deviance")
+    rownames(dic.stat)<-c("D.bar","pD","DIC")
     colnames(dic.stat)<-""
     out$DIC<-dic.stat
+  }
+
+  if(mcmc.samples){
+    out$mcmc.samples<-jags.out
   }
 
   if(!all(trace=="")){

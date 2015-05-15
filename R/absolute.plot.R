@@ -1,4 +1,4 @@
-ci.plot <- function(nma.obj,alphabetic=TRUE){
+absolute.plot <- function(nma.obj,alphabetic=TRUE){
  .pardefault<-par(no.readonly=TRUE)
   par(tck=-0.02,mgp=c(1.5,0.5,0),mar=c(3,4,1,4),cex=0.85)
   ## set parameters
@@ -10,9 +10,9 @@ ci.plot <- function(nma.obj,alphabetic=TRUE){
     ci<-nma.obj$TrtEffect$Median_CI
     armparam<-"Treatment Effect"
   }
-  if(!is.null(nma.obj$LogHazardRate)){
-    ci<-nma.obj$LogHazardRate$Median_CI
-    armparam<-"Log Hazard Rate"
+  if(!is.null(nma.obj$LogRate)){
+    ci<-nma.obj$LogRate$Median_CI
+    armparam<-"Log Rate"
   }
   n.tr<-dim(ci)[1]
   xx<-1:n.tr

@@ -13,7 +13,8 @@ nma.ab(s.id, t.id, event.n, total.n, data, trtname,
        higher.better = FALSE, digits = 4, n.adapt = 5000,
        n.iter = 100000, n.burnin = floor(n.iter/2), n.chains = 3,
        n.thin = max(1, floor((n.iter - n.burnin)/100000)),
-       conv.diag = FALSE, trace = "", dic = FALSE, postdens = FALSE)
+       conv.diag = FALSE, trace = "", dic = FALSE, postdens = FALSE,
+       mcmc.samples = FALSE)
 }
 \arguments{
   \item{s.id}{
@@ -81,6 +82,9 @@ nma.ab(s.id, t.id, event.n, total.n, data, trtname,
 }
   \item{postdens}{
   a logical value indicating whether to draw the posterior density plots for treatment-specific absolue risks (ARs). If \code{TRUE}, a .pdf file containing the density plot will be saved in users' current working directory. The default is \code{FALSE}.
+}
+  \item{mcmc.samples}{
+  a logical value indicating whether to save MCMC posterior samples in the output object. The default is \code{FALSE}.
 }
 }
 \details{

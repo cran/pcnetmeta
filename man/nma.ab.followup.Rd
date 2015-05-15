@@ -14,7 +14,7 @@ nma.ab.followup(s.id, t.id, event.n, total.n, followup, data, trtname,
                 n.iter = 100000, n.burnin = floor(n.iter/2), n.chains = 3,
                 n.thin = max(1, floor((n.iter - n.burnin)/100000)),
                 conv.diag = FALSE, trace = "", dic = FALSE,
-                postdens = FALSE)
+                postdens = FALSE, mcmc.samples = FALSE)
 }
 \arguments{
   \item{s.id}{
@@ -85,6 +85,9 @@ nma.ab.followup(s.id, t.id, event.n, total.n, followup, data, trtname,
 }
   \item{postdens}{
   a logical value indicating whether to draw the posterior density plots for treatment-specific rates. If \code{TRUE}, a .pdf file containing the density plot will be saved in users' current working directory. The default is \code{FALSE}.
+}
+  \item{mcmc.samples}{
+  a logical value indicating whether to save MCMC posterior samples in the output object. The default is \code{FALSE}.
 }
 }
 \details{

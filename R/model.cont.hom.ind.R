@@ -1,7 +1,7 @@
 model.cont.hom.ind <- function(prior.type="unif",rank.prob=TRUE){
 if(prior.type=="unif" & rank.prob){
-cat(
-"model{
+modelstring<-"
+model{
  for(i in 1:len){
   mean[i]~dnorm(theta[i],n[i]/pow(sd[i],2))
   theta[i]<-mu[t[i]]+sigma*vi[s[i]]
@@ -22,12 +22,13 @@ cat(
  for(i in 1:ntrt){
   rank.prob[1:ntrt,i]<-equals(rk[],i)
  }
-}",file="tempmodel.txt")
+}
+"
 }
 
 if(prior.type=="unif" & !rank.prob){
-cat(
-"model{
+modelstring<-"
+model{
  for(i in 1:len){
   mean[i]~dnorm(theta[i],n[i]/pow(sd[i],2))
   theta[i]<-mu[t[i]]+sigma*vi[s[i]]
@@ -44,12 +45,13 @@ cat(
   }
  }
  sigma~dunif(0,c)
-}",file="tempmodel.txt")
+}
+"
 }
 
 if(prior.type=="invgamma" & rank.prob){
-cat(
-"model{
+modelstring<-"
+model{
  for(i in 1:len){
   mean[i]~dnorm(theta[i],n[i]/pow(sd[i],2))
   theta[i]<-mu[t[i]]+sigma*vi[s[i]]
@@ -71,12 +73,13 @@ cat(
  for(i in 1:ntrt){
   rank.prob[1:ntrt,i]<-equals(rk[],i)
  }
-}",file="tempmodel.txt")
+}
+"
 }
 
 if(prior.type=="invgamma" & !rank.prob){
-cat(
-"model{
+modelstring<-"
+model{
  for(i in 1:len){
   mean[i]~dnorm(theta[i],n[i]/pow(sd[i],2))
   theta[i]<-mu[t[i]]+sigma*vi[s[i]]
@@ -94,10 +97,13 @@ cat(
  }
  sigma<-1/sqrt(inv.sig.sq)
  inv.sig.sq~dgamma(a,b)
-}",file="tempmodel.txt")
+}
+"
 }
 
 if(!is.element(prior.type,c("unif","invgamma"))){
-  stop("specified prior type are wrong.")
+  stop("specified prior type is wrong.")
 }
+
+return(modelstring)
 }

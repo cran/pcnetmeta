@@ -1,13 +1,13 @@
-\name{ci.plot}
-\alias{ci.plot}
+\name{absolute.plot}
+\alias{absolute.plot}
 \title{
 Plotting Treatment-Specific 95\% Credible Intervals
 }
 \description{
-\code{ci.plot} generates a plot of 95\% credible intervals (CIs) for the treatment-specific effect sizes.
+\code{absolute.plot} generates a plot of 95\% credible intervals (CIs) for the treatment-specific effect sizes.
 }
 \usage{
-ci.plot(nma.obj, alphabetic = TRUE)
+absolute.plot(nma.obj, alphabetic = TRUE)
 }
 \arguments{
   \item{nma.obj}{
@@ -24,6 +24,6 @@ data(smoke)
 nma.out <- nma.ab(s.id, t.id, r, n, data = smoke,
   trtname = c("NC", "SH", "IC", "GC"), param= "AR",
   model = "het_cor", n.adapt = 1000, n.iter = 100)
-ci.plot(nma.out)
-ci.plot(nma.out, FALSE)
+absolute.plot(nma.out)
+absolute.plot(nma.out, FALSE)
 }

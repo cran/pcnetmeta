@@ -1,7 +1,7 @@
 model.py.het.ind <- function(prior.type="unif",rank.prob=TRUE){
 if(prior.type=="unif" & rank.prob){
-cat(
-"model{
+modelstring<-"
+model{
  for(i in 1:len){
   y[i]~dpois(py[i]*lambda[i])
   lambda[i]<-exp(mu[t[i]]+sigma[t[i]]*vi[s[i]])
@@ -25,12 +25,13 @@ cat(
  for(i in 1:ntrt){
   rank.prob[1:ntrt,i]<-equals(rk[],i)
  }
-}",file="tempmodel.txt")
+}
+"
 }
 
 if(prior.type=="unif" & !rank.prob){
-cat(
-"model{
+modelstring<-"
+model{
  for(i in 1:len){
   y[i]~dpois(py[i]*lambda[i])
   lambda[i]<-exp(mu[t[i]]+sigma[t[i]]*vi[s[i]])
@@ -50,12 +51,13 @@ cat(
    logratio[j,k]<-log(ratio[j,k])
   }
  }
-}",file="tempmodel.txt")
+}
+"
 }
 
 if(prior.type=="invgamma" & rank.prob){
-cat(
-"model{
+modelstring<-"
+model{
  for(i in 1:len){
   y[i]~dpois(py[i]*lambda[i])
   lambda[i]<-exp(mu[t[i]]+sigma[t[i]]*vi[s[i]])
@@ -80,12 +82,13 @@ cat(
  for(i in 1:ntrt){
   rank.prob[1:ntrt,i]<-equals(rk[],i)
  }
-}",file="tempmodel.txt")
+}
+"
 }
 
 if(prior.type=="invgamma" & !rank.prob){
-cat(
-"model{
+modelstring<-"
+model{
  for(i in 1:len){
   y[i]~dpois(py[i]*lambda[i])
   lambda[i]<-exp(mu[t[i]]+sigma[t[i]]*vi[s[i]])
@@ -106,10 +109,13 @@ cat(
    logratio[j,k]<-log(ratio[j,k])
   }
  }
-}",file="tempmodel.txt")
+}
+"
 }
 
 if(!is.element(prior.type,c("unif","invgamma"))){
-  stop("specified prior type are wrong.")
+  stop("specified prior type is wrong.")
 }
+
+return(modelstring)
 }

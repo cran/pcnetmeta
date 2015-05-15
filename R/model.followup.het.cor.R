@@ -1,7 +1,7 @@
 model.followup.het.cor <- function(prior.type="invwishart",rank.prob=TRUE){
 if(prior.type=="invwishart" & rank.prob){
-cat(
-"model{
+modelstring<-"
+model{
  for(i in 1:len){
   y[i]~dbin(p[i],totaln[i])
   cloglog(p[i])<-log(f[i])+log(lambda[i])
@@ -28,12 +28,13 @@ cat(
  for(i in 1:ntrt){
   rank.prob[1:ntrt,i]<-equals(rk[],i)
  }
-}",file="tempmodel.txt")
+}
+"
 }
 
 if(prior.type=="invwishart" & !rank.prob){
-cat(
-"model{
+modelstring<-"
+model{
  for(i in 1:len){
   y[i]~dbin(p[i],totaln[i])
   cloglog(p[i])<-log(f[i])+log(lambda[i])
@@ -56,10 +57,13 @@ cat(
    logratio[j,k]<-log(ratio[j,k])
   }
  }
-}",file="tempmodel.txt")
+}
+"
 }
 
 if(!is.element(prior.type,c("invwishart"))){
-  stop("specified prior type are wrong.")
+  stop("specified prior type is wrong.")
 }
+
+return(modelstring)
 }

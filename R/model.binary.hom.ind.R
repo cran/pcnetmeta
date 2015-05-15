@@ -1,7 +1,7 @@
 model.binary.hom.ind <- function(prior.type="unif",rank.prob=TRUE){
 if(prior.type=="unif" & rank.prob){
-cat(
-"model{
+modelstring<-"
+model{
  for(i in 1:len){
   p[i]<-phi(mu[t[i]]+sigma*vi[s[i]])
   r[i]~dbin(p[i],totaln[i])
@@ -27,12 +27,13 @@ cat(
  for(i in 1:ntrt){
   rank.prob[1:ntrt,i]<-equals(rk[],i)
  }
-}",file="tempmodel.txt")
+}
+"
 }
 
 if(prior.type=="unif" & !rank.prob){
-cat(
-"model{
+modelstring<-"
+model{
  for(i in 1:len){
   p[i]<-phi(mu[t[i]]+sigma*vi[s[i]])
   r[i]~dbin(p[i],totaln[i])
@@ -54,12 +55,13 @@ cat(
    OR[j,k]<-AR[j]/(1-AR[j])/AR[k]*(1-AR[k])
   }
  }
-}",file="tempmodel.txt")
+}
+"
 }
 
 if(prior.type=="invgamma" & rank.prob){
-cat(
-"model{
+modelstring<-"
+model{
  for(i in 1:len){
   p[i]<-phi(mu[t[i]]+sigma*vi[s[i]])
   r[i]~dbin(p[i],totaln[i])
@@ -86,12 +88,13 @@ cat(
  for(i in 1:ntrt){
   rank.prob[1:ntrt,i]<-equals(rk[],i)
  }
-}",file="tempmodel.txt")
+}
+"
 }
 
 if(prior.type=="invgamma" & !rank.prob){
-cat(
-"model{
+modelstring<-"
+model{
  for(i in 1:len){
   p[i]<-phi(mu[t[i]]+sigma*vi[s[i]])
   r[i]~dbin(p[i],totaln[i])
@@ -114,10 +117,13 @@ cat(
    OR[j,k]<-AR[j]/(1-AR[j])/AR[k]*(1-AR[k])
   }
  }
-}",file="tempmodel.txt")
+}
+"
 }
 
 if(!is.element(prior.type,c("unif","invgamma"))){
-  stop("specified prior type are wrong.")
+  stop("specified prior type is wrong.")
 }
+
+return(modelstring)
 }

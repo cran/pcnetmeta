@@ -1,5 +1,5 @@
 nma.ab.py <-
-function(s.id,t.id,event.n,py,data,trtname,param=c("lograte","logratio","rank.prob"),model="het_cor",prior.type,a=0.001,b=0.001,c=10,higher.better=FALSE,digits=4,n.adapt=5000,n.iter=100000,n.burnin=floor(n.iter/2),n.chains=3,n.thin=max(1,floor((n.iter-n.burnin)/100000)),conv.diag=FALSE,trace="",dic=FALSE,postdens=FALSE){
+function(s.id,t.id,event.n,py,data,trtname,param=c("lograte","logratio","rank.prob"),model="het_cor",prior.type,a=0.001,b=0.001,c=10,higher.better=FALSE,digits=4,n.adapt=5000,n.iter=100000,n.burnin=floor(n.iter/2),n.chains=3,n.thin=max(1,floor((n.iter-n.burnin)/100000)),conv.diag=FALSE,trace="",dic=FALSE,postdens=FALSE,mcmc.samples=FALSE){
   ## check the input parameters
   options(warn=1)
   if(missing(s.id)) stop("need to specify study id.")
@@ -40,20 +40,20 @@ function(s.id,t.id,event.n,py,data,trtname,param=c("lograte","logratio","rank.pr
 
   ## jags model
   if(model=="hom_ind"){
-    model.py.hom.ind(prior.type,is.element("rank.prob",param))
+    modelstring<-model.py.hom.ind(prior.type,is.element("rank.prob",param))
   }
   if(model=="het_ind"){
-    model.py.het.ind(prior.type,is.element("rank.prob",param))
+    modelstring<-model.py.het.ind(prior.type,is.element("rank.prob",param))
   }
   if(model=="hom_eqcor"){
-    model.py.hom.eqcor(prior.type,is.element("rank.prob",param))
+    modelstring<-model.py.hom.eqcor(prior.type,is.element("rank.prob",param))
   }
   if(model=="het_eqcor"){
-    model.py.het.eqcor(prior.type,is.element("rank.prob",param))
+    modelstring<-model.py.het.eqcor(prior.type,is.element("rank.prob",param))
   }
   if(model=="het_cor"){
     I <- diag(ntrt)
-    model.py.het.cor(prior.type,is.element("rank.prob",param))
+    modelstring<-model.py.het.cor(prior.type,is.element("rank.prob",param))
   }
 
   ## jags data
@@ -166,8 +166,7 @@ function(s.id,t.id,event.n,py,data,trtname,param=c("lograte","logratio","rank.pr
 
   ## run jags
   cat("start running MCMC...\n")
-  jags.m<-jags.model(file="tempmodel.txt",data=data.jags,inits=init.jags,n.chains=n.chains,n.adapt=n.adapt)
-  unlink("tempmodel.txt")
+  jags.m<-jags.model(file=textConnection(modelstring),data=data.jags,inits=init.jags,n.chains=n.chains,n.adapt=n.adapt)
   update(jags.m,n.iter=n.burnin)
   jags.out<-coda.samples(model=jags.m,variable.names=monitor,n.iter=n.iter,thin=n.thin)
   smry<-summary(jags.out)
@@ -182,7 +181,7 @@ function(s.id,t.id,event.n,py,data,trtname,param=c("lograte","logratio","rank.pr
   lograte.quan<-array(paste(format(round(smry[lograte.id,"50%"],digits=digits),nsmall=digits)," (",format(round(smry[lograte.id,"2.5%"],digits=digits),nsmall=digits),", ",format(round(smry[lograte.id,"97.5%"],digits=digits),nsmall=digits),")",sep=""),dim=c(ntrt,1))
   colnames(lograte.quan)<-"Median (95% CI)"
   rownames(lograte.quan)<-trtname
-  out$LogHazardRate<-list(Mean_SD=noquote(lograte.stat),Median_CI=noquote(lograte.quan))
+  out$LogRate<-list(Mean_SD=noquote(lograte.stat),Median_CI=noquote(lograte.quan))
 
   if(is.element("rate",param)){
     rate.id<-which(is.element(rownames(smry),paste("rate[",1:ntrt,"]",sep="")))
@@ -192,7 +191,7 @@ function(s.id,t.id,event.n,py,data,trtname,param=c("lograte","logratio","rank.pr
     rate.quan<-array(paste(format(round(smry[rate.id,"50%"],digits=digits),nsmall=digits)," (",format(round(smry[rate.id,"2.5%"],digits=digits),nsmall=digits),", ",format(round(smry[rate.id,"97.5%"],digits=digits),nsmall=digits),")",sep=""),dim=c(ntrt,1))
     colnames(rate.quan)<-"Median (95% CI)"
     rownames(rate.quan)<-trtname
-    out$HazardRate<-list(Mean_SD=noquote(rate.stat),Median_CI=noquote(rate.quan))
+    out$Rate<-list(Mean_SD=noquote(rate.stat),Median_CI=noquote(rate.quan))
   }
 
   if(is.element("ratio",param)){
@@ -208,7 +207,7 @@ function(s.id,t.id,event.n,py,data,trtname,param=c("lograte","logratio","rank.pr
         }
       }
     }
-    out$HazardRatio<-list(Mean_SD=noquote(ratio.stat),Median_CI=noquote(ratio.quan))
+    out$RateRatio<-list(Mean_SD=noquote(ratio.stat),Median_CI=noquote(ratio.quan))
   }
 
   if(is.element("logratio",param)){
@@ -226,7 +225,7 @@ function(s.id,t.id,event.n,py,data,trtname,param=c("lograte","logratio","rank.pr
         }
       }
     }
-    out$LogHazardRatio<-list(Mean_SD=noquote(logratio.stat),Median_CI=noquote(logratio.quan))
+    out$LogRateRatio<-list(Mean_SD=noquote(logratio.stat),Median_CI=noquote(logratio.quan))
   }
 
   if(is.element("rank.prob",param)){
@@ -255,9 +254,13 @@ function(s.id,t.id,event.n,py,data,trtname,param=c("lograte","logratio","rank.pr
     pen<-sum(dic.out$penalty)
     pen.dev<-dev+pen
     dic.stat<-rbind(dev,pen,pen.dev)
-    rownames(dic.stat)<-c("Mean deviance","Penalty","Penalized deviance")
+    rownames(dic.stat)<-c("D.bar","pD","DIC")
     colnames(dic.stat)<-""
     out$DIC<-dic.stat
+  }
+
+  if(mcmc.samples){
+    out$mcmc.samples<-jags.out
   }
 
   if(!all(trace=="")){
@@ -270,7 +273,7 @@ function(s.id,t.id,event.n,py,data,trtname,param=c("lograte","logratio","rank.pr
       par(mfrow=c(n.chains,1))
       for(j in 1:n.chains){
         temp<-as.vector(jags.out[[j]][,paste("rate[",i,"]",sep="")])
-        plot(temp,type="l",col="red",ylab="Hazard Rate",xlab="Iterations",main=paste("Chain",j))
+        plot(temp,type="l",col="red",ylab="Rate",xlab="Iterations",main=paste("Chain",j))
       }
       dev.off()
     }
@@ -281,7 +284,7 @@ function(s.id,t.id,event.n,py,data,trtname,param=c("lograte","logratio","rank.pr
       par(mfrow=c(n.chains,1))
       for(j in 1:n.chains){
         temp<-as.vector(jags.out[[j]][,paste("lograte[",i,"]",sep="")])
-        plot(temp,type="l",col="red",ylab="Log Hazard Rate",xlab="Iterations",main=paste("Chain",j))
+        plot(temp,type="l",col="red",ylab="Log Rate",xlab="Iterations",main=paste("Chain",j))
       }
       dev.off()
     }
@@ -294,7 +297,7 @@ function(s.id,t.id,event.n,py,data,trtname,param=c("lograte","logratio","rank.pr
           par(mfrow=c(n.chains,1))
           for(j in 1:n.chains){
             temp<-as.vector(jags.out[[j]][,paste("ratio[",i,",",k,"]",sep="")])
-            plot(temp,type="l",col="red",ylab="Hazard Ratio",xlab="Iterations",main=paste("Chain",j))
+            plot(temp,type="l",col="red",ylab="Rate Ratio",xlab="Iterations",main=paste("Chain",j))
           }
           dev.off()
         }
@@ -309,7 +312,7 @@ function(s.id,t.id,event.n,py,data,trtname,param=c("lograte","logratio","rank.pr
           par(mfrow=c(n.chains,1))
           for(j in 1:n.chains){
             temp<-as.vector(jags.out[[j]][,paste("logratio[",i,",",k,"]",sep="")])
-            plot(temp,type="l",col="red",ylab="Log Hazard Ratio",xlab="Iterations",main=paste("Chain",j))
+            plot(temp,type="l",col="red",ylab="Log Rate Ratio",xlab="Iterations",main=paste("Chain",j))
           }
           dev.off()
         }
@@ -318,7 +321,7 @@ function(s.id,t.id,event.n,py,data,trtname,param=c("lograte","logratio","rank.pr
   }
 
   if(postdens){
-    cat("start saving posterior density plot for log hazard rate...\n")
+    cat("start saving posterior density plot for log rate...\n")
     mcmc<-NULL
     dens<-matrix(0,ntrt,3)
     colnames(dens)<-c("ymax","xmin","xmax")
@@ -335,9 +338,9 @@ function(s.id,t.id,event.n,py,data,trtname,param=c("lograte","logratio","rank.pr
     xmin<-min(dens[,"xmin"])
     xmax<-max(dens[,"xmax"])
     cols<-rainbow(ntrt,s=1,v=0.6)
-    pdf("LogHazardRateDensityPlot.pdf")
+    pdf("LogRateDensityPlot.pdf")
     par(mfrow=c(1,1))
-    plot(density(mcmc[[1]]),xlim=c(xmin,xmax),ylim=c(0,ymax),xlab="Log Hazard Rate",ylab="Density",main="",col=cols[1],lty=1,lwd=2)
+    plot(density(mcmc[[1]]),xlim=c(xmin,xmax),ylim=c(0,ymax),xlab="Log Rate",ylab="Density",main="",col=cols[1],lty=1,lwd=2)
     for(i in 2:ntrt){
       lines(density(mcmc[[i]]),col=cols[i],lty=i,lwd=2)
     }
