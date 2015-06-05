@@ -21,8 +21,9 @@ A plot is generated. Each vertical bar represents probabilities of being differe
 \examples{
 data(smoke)
 # increase n.iter to reach convergence
+# increase n.adapt to enhance efficiency
 nma.out <- nma.ab(s.id, t.id, r, n, data = smoke,
-  trtname = c("NC", "SH", "IC", "GC"), param= "rank.prob",
-  model = "het_cor", higher.better = TRUE, n.adapt = 1000, n.iter = 100)
+  trtname = c("NC", "SH", "IC", "GC"), param= "rank.prob", model = "het_cor",
+  higher.better = TRUE, n.adapt = 0, n.iter = 100, n.chains = 1)
 rank.prob(nma.out)
 }

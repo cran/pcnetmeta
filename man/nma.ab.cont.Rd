@@ -120,7 +120,8 @@ Zhang J, Carlin BP, Neaton JD, Soon GG, Nie L, Kane R, Virnig BA, Chu H (2014). 
 data(parkinson)
 
 # increase n.iter to reach convergence of MCMC
+# increase n.adapt to enhance efficiency
 cont.out <- nma.ab.cont(s.id, t.id, mean, sd, n, data = parkinson,
   param = c("mu", "diff"), model = "hom_eqcor", prior.type = "unif",
-  n.adapt = 1000, n.iter = 100, dic = TRUE)
+  n.adapt = 0, n.iter = 100, n.chains = 1)
 }

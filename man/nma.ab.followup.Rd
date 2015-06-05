@@ -121,6 +121,7 @@ Zhang J, Carlin BP, Neaton JD, Soon GG, Nie L, Kane R, Virnig BA, Chu H (2014). 
 data(diabetes)
 
 # increase n.iter to reach convergence of MCMC
+# increase n.adapt to enhance efficiency
 followup.out <- nma.ab.followup(s.id, t.id, r, n, folup, data = diabetes,
-  model = "het_cor", n.adapt = 1000, n.iter = 1000)
+  model = "het_cor", n.adapt = 0, n.iter = 100, n.chains = 1)
 }

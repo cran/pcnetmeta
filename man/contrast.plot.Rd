@@ -36,9 +36,10 @@ A contrast plot for relative effect sizes is saved as a .pdf file in users' curr
 \examples{
 data(smoke)
 # increase n.iter to reach convergence
+# increase n.adapt to enhance efficiency
 nma.out <- nma.ab(s.id, t.id, r, n, data = smoke,
   trtname = c("NC", "SH", "IC", "GC"), param= "LOR",
-  model = "het_cor", n.adapt = 1000, n.iter = 100)
+  model = "het_cor", n.adapt = 0, n.iter = 100, n.chains = 1)
 contrast.plot(nma.out)
 # use getwd() to find the path of generated contrast plot
 }

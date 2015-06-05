@@ -117,6 +117,7 @@ Zhang J, Carlin BP, Neaton JD, Soon GG, Nie L, Kane R, Virnig BA, Chu H (2014). 
 data(dietaryfat)
 
 # increase n.iter to reach convergence of MCMC
+# increase n.adapt to enhance efficiency
 py.out <- nma.ab.py(s.id, t.id, r, py, data = dietaryfat, model = "het_cor",
-  n.adapt = 1000, n.iter = 100)
+  n.adapt = 0, n.iter = 100, n.chains = 1)
 }

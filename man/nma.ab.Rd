@@ -133,7 +133,8 @@ data(smoke)
 
 # use the model = "hom_eqcor"
 # increase n.iter to reach convergence
+# increase n.adapt to enhance efficiency
 hom.eqcor.out <- nma.ab(s.id, t.id, r, n, data = smoke,
   param = c("AR", "LRR"), model = "hom_eqcor", prior.type = "unif", c = 10,
-  higher.better = TRUE, n.adapt = 1000, n.iter = 100)
+  higher.better = TRUE, n.adapt = 0, n.iter = 100, n.chains = 1)
 }

@@ -21,9 +21,10 @@ absolute.plot(nma.obj, alphabetic = TRUE)
 \examples{
 data(smoke)
 # increase n.iter to reach convergence
+# increase n.adapt to enhance efficiency
 nma.out <- nma.ab(s.id, t.id, r, n, data = smoke,
   trtname = c("NC", "SH", "IC", "GC"), param= "AR",
-  model = "het_cor", n.adapt = 1000, n.iter = 100)
+  model = "het_cor", n.adapt = 0, n.iter = 100, n.chains = 1)
 absolute.plot(nma.out)
 absolute.plot(nma.out, FALSE)
 }
