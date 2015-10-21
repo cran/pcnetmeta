@@ -13,7 +13,7 @@ Currently, much effort in network meta-analysis has been devoted to contrast-bas
 
 Alternatively, arm-based network meta-analysis focuses on estimating treatment-specific parameters, and relative effects can be subsequently obtained. The arm-based models for binary outcomes are discussed in Salanti et al (2008) and Zhang et al (2014).
 
-This package provides user-friendly functions for arm-based network meta-analysis. Function \code{\link{nma.ab}} uses the model in Zhang et al (2014) for binary outcomes; it provides estimates for absolute risk (AR), relative risk (RR), risk difference (RD), odds ratio (OR), log RR, and log OR. This package also handles continuous outcomes and count data.
+This package provides user-friendly functions for arm-based network meta-analysis. Function \code{\link{nma.ab}} uses the model in Zhang et al (2014) for binary outcomes; it provides estimates for absolute risk (AR), risk ratio (RR), risk difference (RD), odds ratio (OR), log RR, and log OR. This package also handles continuous outcomes and count data.
 
 Parameter estimation in arm-based Bayesian hierarchical models are performed through JAGS. Note that this package does not include a copy of JAGS library, so users must install JAGS separately. Please refer to the JAGS home page at \url{http://mcmc-jags.sourceforge.net/} for instructions on downloading and installing JAGS.
 }

@@ -1,4 +1,4 @@
-contrast.plot <- function(nma.obj,effect.size,reference,left.margin=0.5,width=10,height){
+contrast.plot <- function(nma.obj,effect.size,reference,digits=2,width=5,height){
   if(missing(nma.obj)) stop("nma.obj is not specified.")
   if(missing(effect.size)){
     if(!is.null(nma.obj$OddsRatio) | !is.null(nma.obj$LogOddsRatio)){
@@ -160,11 +160,11 @@ contrast.plot <- function(nma.obj,effect.size,reference,left.margin=0.5,width=10
     nullval<-0
   }
   if(effect.size=="RR"){
-    efname<-"Relative Risk"
+    efname<-"Risk Ratio"
     nullval<-1
   }
   if(effect.size=="LRR"){
-    efname<-"Log Relative Risk"
+    efname<-"Log Risk Ratio"
     nullval<-0
   }
   if(effect.size=="RD"){
@@ -184,26 +184,38 @@ contrast.plot <- function(nma.obj,effect.size,reference,left.margin=0.5,width=10
     nullval<-0
   }
 
-  rg<-max(upp)-min(low)
-  incr<-signif(rg/5,1)
-  len.out<-ceiling(max(c(abs(max(upp)-nullval),abs(min(low)-nullval)))/incr)+100
-  xticks<-c(seq(from=nullval,by=incr,length.out=len.out),seq(from=nullval-incr,by=-incr,length.out=len.out))
-  x.left<-min(low)-rg/10
-  x.right<-max(upp)+rg/10
+  logscale<-FALSE
+  if(is.element(effect.size,c("OR","RR","ratio"))){
+    logscale<-TRUE
+  }
+
+
+  med.print<-format(round(med,digits=digits),nsmall=digits)
+  low.print<-format(round(low,digits=digits),nsmall=digits)
+  upp.print<-format(round(upp,digits=digits),nsmall=digits)
+  cis<-paste(med.print," (",low.print,", ",upp.print,")",sep="")
 
   if(missing(height)) height<-ntrt-1
   pdf(paste("ContrastPlot_",effect.size,".pdf",sep=""),width=width,height=height)
-  par(mar=c(4.1,max(nchar(contrast.name))*left.margin,1,1))
-  plot(c(low,upp),rep(rev(1:(ntrt-1)),2),xlim=c(x.left,x.right),ylim=c(0.8,ntrt-1),frame.plot=FALSE,xaxt="n",yaxt="n",xlab=efname,ylab="",cex=0.1,col="white")
+  par(mfrow=c(1,1),mai=c(0.5,max(strwidth(contrast.name,"inches"))+0.1,0.1,max(strwidth(cis,"inches"))+0.1),mgp=c(1.5,0.5,0))
+  if(logscale){
+    plot(x=c(low,upp,nullval),y=c(rep(rev(1:(ntrt-1)),2),1),ylim=c(0.8,ntrt-1),log="x",frame.plot=FALSE,yaxt="n",xlab=efname,ylab="",cex=0.1,col="white")
+  }else{
+    plot(x=c(low,upp,nullval),y=c(rep(rev(1:(ntrt-1)),2),1),ylim=c(0.8,ntrt-1),frame.plot=FALSE,yaxt="n",xlab=efname,ylab="",cex=0.1,col="white")
+  }
   points(med,rev(1:(ntrt-1)),pch=15)
-  axis(1,at=xticks,labels=xticks)
   for(i in 1:(ntrt-1)){
     lines(x=c(low[i],upp[i]),y=c(ntrt-i,ntrt-i))
   }
-  abline(v=nullval,col="grey")
+  abline(v=nullval,col="grey",lty=2)
   for(i in 1:(ntrt-1)){
     mtext(contrast.name[i],side=2,at=ntrt-i,las=1)
   }
-  par(mar=c(5,4,4,2)+0.1)
+  for(i in 1:(ntrt-1)){
+    mtext(cis[i],side=4,at=ntrt-i,las=1)
+  }
+  par(mai=c(1.02,0.82,0.82,0.42),mgp=c(3,1,0))
   garbage<-dev.off()
+  cat("The contrast plot is saved in your working directory:\n")
+  cat(paste(getwd(),"\n",sep=""))
 }

@@ -1,7 +1,4 @@
-absolute.plot <- function(nma.obj,alphabetic=TRUE){
- .pardefault<-par(no.readonly=TRUE)
-  par(tck=-0.02,mgp=c(1.5,0.5,0),mar=c(3,4,1,4),cex=0.85)
-  ## set parameters
+absolute.plot <- function(nma.obj,alphabetic=TRUE,digits=2,width=5,height){
   if(!is.null(nma.obj$AbsoluteRisk)){
     ci<-nma.obj$AbsoluteRisk$Median_CI
     armparam<-"Absolute Risk"
@@ -14,12 +11,12 @@ absolute.plot <- function(nma.obj,alphabetic=TRUE){
     ci<-nma.obj$LogRate$Median_CI
     armparam<-"Log Rate"
   }
-  n.tr<-dim(ci)[1]
-  xx<-1:n.tr
+  ntrt<-dim(ci)[1]
+  xx<-1:ntrt
   trtname<-rownames(ci)
 
-  med<-low<-upp<-numeric(n.tr)
-  for(i in 1:n.tr){
+  med<-low<-upp<-numeric(ntrt)
+  for(i in 1:ntrt){
     str<-ci[i,1]
     split1<-strsplit(str,split=" \\(")
     med[i]<-as.numeric(split1[[1]][1])
@@ -37,26 +34,27 @@ absolute.plot <- function(nma.obj,alphabetic=TRUE){
     upp<-upp[od]
   }
 
-  ## plot
-  graph.range<-max(upp)-min(low)
-  incr<-signif(0.2*graph.range,1)
-  y.lim<-c(min(low)-0.1*graph.range,max(upp)+0.1*graph.range)
+  med.print<-format(round(med,digits=digits),nsmall=digits)
+  low.print<-format(round(low,digits=digits),nsmall=digits)
+  upp.print<-format(round(upp,digits=digits),nsmall=digits)
+  cis<-paste(med.print," (",low.print,", ",upp.print,")",sep="")
 
-  plot(xx,med,xlim=c(0.5,n.tr+0.5),ylim=y.lim,type="n",xaxs="i",
-       yaxs="i",xaxt="n",yaxt="n",lwd=2,ylab=armparam,xlab="",cex=1)
-  hlines<-seq(from=signif(min(low),1),by=incr,length.out=100)
-  hlines2<-seq(from=signif(min(low),1),by=-incr,length.out=100)
-  hlines <- c(hlines2, hlines)
-  n.digits<-ifelse(incr<=1,ceiling(-log(abs(incr))/log(10)),0)
-  hlines<-round(hlines,n.digits)
-  abline(h=hlines,lty=4,lwd=0.5,col="grey")
-  for(i in 1:n.tr){
-    lines(c(xx[i],xx[i]),c(low[i],upp[i]),lty=1,lwd=2,col="black")
-    points(xx[i],med[i],pch=15,cex=1,col="black")
-    points(xx[i],low[i],pch=8,cex=1,col="black")
-    points(xx[i],upp[i],pch=8,cex=1,col="black")
+  if(missing(height)) height<-ntrt-1
+  pdf(paste("AbsolutePlot_",armparam,".pdf",sep=""),width=width,height=height)
+  par(mfrow=c(1,1),mai=c(0.5,max(strwidth(trtname,"inches"))+0.1,0.1,max(strwidth(cis,"inches"))+0.1),mgp=c(1.5,0.5,0))
+  plot(x=c(low,upp),y=rep(rev(1:ntrt),2),ylim=c(0.8,ntrt),frame.plot=FALSE,yaxt="n",xlab=armparam,ylab="",cex=0.1,col="white")
+  points(med,rev(1:ntrt),pch=15)
+  for(i in 1:ntrt){
+    lines(x=c(low[i],upp[i]),y=c(ntrt+1-i,ntrt+1-i))
   }
-  axis(1,at=seq(1,n.tr,1),labels=trtname,tick=TRUE)
-  axis(2,at=hlines,labels=hlines,tick=TRUE)
-  par(.pardefault)
+  for(i in 1:ntrt){
+    mtext(trtname[i],side=2,at=ntrt+1-i,las=1)
+  }
+  for(i in 1:ntrt){
+    mtext(cis[i],side=4,at=ntrt+1-i,las=1)
+  }
+  par(mai=c(1.02,0.82,0.82,0.42),mgp=c(3,1,0))
+  garbage<-dev.off()
+  cat("The absolute plot is saved in your working directory:\n")
+  cat(paste(getwd(),"\n",sep=""))
 }

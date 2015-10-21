@@ -7,7 +7,7 @@ Contrast Plot of Relative Effect Sizes
 \code{contrast.plot} generates contrast plot, which shows 95\% credible intervals (CIs) for relative effect sizes.
 }
 \usage{
-contrast.plot(nma.obj, effect.size, reference, left.margin = 0.5, width = 10, height)
+contrast.plot(nma.obj, effect.size, reference, digits = 2, width = 5, height)
 }
 \arguments{
   \item{nma.obj}{
@@ -19,11 +19,11 @@ contrast.plot(nma.obj, effect.size, reference, left.margin = 0.5, width = 10, he
   \item{reference}{
   a character string indicating the reference treatment name to be compared against.
 }
-  \item{left.margin}{
-  a positive number to adjust the left margin of the plot. A higher value leads to a wider left margin. The default is 0.5.
+  \item{digits}{
+  an integer indicating the number of decimal places to be used for the point estimates and 95\% CIs. The default is \code{2}.
 }
   \item{width}{
-  a positive number indicating the plot width. The default is 10.
+  a positive number indicating the plot width. The default is 5.
 }
   \item{height}{
   a positive number indicating the plot height. The default is the treatment number minus 1.
@@ -37,9 +37,9 @@ A contrast plot for relative effect sizes is saved as a .pdf file in users' curr
 data(smoke)
 # increase n.iter to reach convergence
 # increase n.adapt to enhance efficiency
+set.seed(1234)
 nma.out <- nma.ab(s.id, t.id, r, n, data = smoke,
   trtname = c("NC", "SH", "IC", "GC"), param= "LOR",
-  model = "het_cor", n.adapt = 0, n.iter = 100, n.chains = 1)
+  model = "het_cor", n.adapt = 400, n.iter = 100, n.chains = 1)
 contrast.plot(nma.out)
-# use getwd() to find the path of generated contrast plot
 }

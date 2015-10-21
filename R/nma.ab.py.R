@@ -1,5 +1,5 @@
 nma.ab.py <-
-function(s.id,t.id,event.n,py,data,trtname,param=c("lograte","logratio","rank.prob"),model="het_cor",prior.type,a=0.001,b=0.001,c=10,higher.better=FALSE,digits=4,n.adapt=5000,n.iter=100000,n.burnin=floor(n.iter/2),n.chains=3,n.thin=max(1,floor((n.iter-n.burnin)/100000)),conv.diag=FALSE,trace="",dic=FALSE,postdens=FALSE,mcmc.samples=FALSE){
+function(s.id,t.id,event.n,py,data,trtname,param=c("lograte","logratio","rank.prob"),model="het_cor",prior.type,a=0.001,b=0.001,c=10,higher.better=FALSE,digits=4,n.adapt=5000,n.iter=100000,n.burnin=floor(n.iter/2),n.chains=3,n.thin=max(1,floor((n.iter-n.burnin)/100000)),conv.diag=FALSE,trace=NULL,dic=FALSE,postdens=FALSE,mcmc.samples=FALSE){
   ## check the input parameters
   options(warn=1)
   if(missing(s.id)) stop("need to specify study id.")
@@ -16,7 +16,11 @@ function(s.id,t.id,event.n,py,data,trtname,param=c("lograte","logratio","rank.pr
     stop("s.id, t.id, event.n, and py have different lengths.")
   }
   if(!all(py>0)) stop("person-years must be positive.")
-  if(!is.element(model,c("hom_ind","het_ind","hom_eqcor","het_eqcor","het_cor"))) stop("model should be specified as \"hom_ind\", \"het_ind\", \"hom_eqcor\", \"het_eqcor\", or \"het_cor\".")
+  if(!is.element(model,c("hom_eqcor","het_eqcor","het_cor"))) stop("model should be specified as \"hom_eqcor\", \"het_eqcor\", or \"het_cor\".")
+
+  if(any(is.na(s.id))|any(is.na(t.id))|any(is.na(event.n))|any(is.na(py))){
+    stop("NA is not allowed in the input data set;\n  the rows containing NA should be removed.")
+  }
 
   ## make ids continuous
   s.id.o<-s.id
@@ -39,12 +43,6 @@ function(s.id,t.id,event.n,py,data,trtname,param=c("lograte","logratio","rank.pr
   if(missing(prior.type)) prior.type<-ifelse(model=="het_cor","invwishart","unif")
 
   ## jags model
-  if(model=="hom_ind"){
-    modelstring<-model.py.hom.ind(prior.type,is.element("rank.prob",param))
-  }
-  if(model=="het_ind"){
-    modelstring<-model.py.het.ind(prior.type,is.element("rank.prob",param))
-  }
   if(model=="hom_eqcor"){
     modelstring<-model.py.hom.eqcor(prior.type,is.element("rank.prob",param))
   }
@@ -57,16 +55,6 @@ function(s.id,t.id,event.n,py,data,trtname,param=c("lograte","logratio","rank.pr
   }
 
   ## jags data
-  if(model == "hom_ind"| model == "het_ind"){
-    if(prior.type == "unif"){
-      if(is.element("rank.prob",param)) data.jags<-list(s=s.id,t=t.id,y=event.n,py=py,len=len,nstudy=nstudy,ntrt=ntrt,c=c,higher.better=higher.better)
-      if(!is.element("rank.prob",param)) data.jags<-list(s=s.id,t=t.id,y=event.n,py=py,len=len,nstudy=nstudy,ntrt=ntrt,c=c)
-    }
-    if(prior.type == "invgamma"){
-      if(is.element("rank.prob",param)) data.jags<-list(s=s.id,t=t.id,y=event.n,py=py,len=len,nstudy=nstudy,ntrt=ntrt,a=a,b=b,higher.better=higher.better)
-      if(!is.element("rank.prob",param)) data.jags<-list(s=s.id,t=t.id,y=event.n,py=py,len=len,nstudy=nstudy,ntrt=ntrt,a=a,b=b)
-    }
-  }
   if(model == "hom_eqcor"| model == "het_eqcor"){
     if(prior.type == "unif"){
       if(is.element("rank.prob",param)) data.jags<-list(s=s.id,t=t.id,y=event.n,py=py,len=len,nstudy=nstudy,ntrt=ntrt,zeros=rep(0,ntrt),c=c,higher.better=higher.better)
@@ -89,30 +77,6 @@ function(s.id,t.id,event.n,py,data,trtname,param=c("lograte","logratio","rank.pr
     mu.init[i]<-mean(log(event.n[t.id==t.id[i]]/py[t.id==t.id[i]]+0.0001))
   }
   init.jags<-list(NULL)
-  if(model=="hom_ind"){
-    if(prior.type=="unif"){
-      for(ii in 1:n.chains){
-        init.jags[[ii]]<-list(mu=mu.init,vi=rep(0,nstudy),sigma=c/2,.RNG.name="base::Wichmann-Hill",.RNG.seed=rng.seeds[ii])
-      }
-    }
-    if(prior.type=="invgamma"){
-      for(ii in 1:n.chains){
-        init.jags[[ii]]<-list(mu=mu.init,vi=rep(0,nstudy),inv.sig.sq=a/b,.RNG.name="base::Wichmann-Hill",.RNG.seed=rng.seeds[ii])
-      }
-    }
-  }
-  if(model=="het_ind"){
-    if(prior.type=="unif"){
-      for(ii in 1:n.chains){
-        init.jags[[ii]]<-list(mu=mu.init,vi=rep(0,nstudy),sigma=rep(c/2,ntrt),.RNG.name="base::Wichmann-Hill",.RNG.seed=rng.seeds[ii])
-      }
-    }
-    if(prior.type=="invgamma"){
-      for(ii in 1:n.chains){
-        init.jags[[ii]]<-list(mu=mu.init,vi=rep(0,nstudy),inv.sig.sq=rep(a/b,ntrt),.RNG.name="base::Wichmann-Hill",.RNG.seed=rng.seeds[ii])
-      }
-    }
-  }
   if(model=="hom_eqcor"){
     if(prior.type=="unif"){
       for(ii in 1:n.chains){
@@ -145,7 +109,7 @@ function(s.id,t.id,event.n,py,data,trtname,param=c("lograte","logratio","rank.pr
 
   ## parameters to be monitored in jags
   if(!is.element("lograte",param)) param<-c("lograte",param)
-  if(trace!=""){
+  if(!is.null(trace)){
     if(!any(is.element(trace, param))) stop("at least one effect size in argument trace is not specified in argument param.")
   }
   monitor<-param[!is.element(param,c("ratio","logratio"))]
@@ -165,7 +129,7 @@ function(s.id,t.id,event.n,py,data,trtname,param=c("lograte","logratio","rank.pr
   }
 
   ## run jags
-  cat("start running MCMC...\n")
+  cat("Start running MCMC...\n")
   jags.m<-jags.model(file=textConnection(modelstring),data=data.jags,inits=init.jags,n.chains=n.chains,n.adapt=n.adapt)
   update(jags.m,n.iter=n.burnin)
   jags.out<-coda.samples(model=jags.m,variable.names=monitor,n.iter=n.iter,thin=n.thin)
@@ -174,6 +138,7 @@ function(s.id,t.id,event.n,py,data,trtname,param=c("lograte","logratio","rank.pr
   smry<-signif(smry,digits=digits)
 
   out<-NULL
+  out$model<-"Poisson likelihood with log link."
   lograte.id<-which(is.element(rownames(smry),paste("lograte[",1:ntrt,"]",sep="")))
   lograte.stat<-array(paste(format(round(smry[lograte.id,"Mean"],digits=digits),nsmall=digits)," (",format(round(smry[lograte.id,"SD"],digits=digits),nsmall=digits),")",sep=""),dim=c(ntrt,1))
   colnames(lograte.stat)<-"Mean (SD)"
@@ -237,7 +202,7 @@ function(s.id,t.id,event.n,py,data,trtname,param=c("lograte","logratio","rank.pr
   }
 
   if(conv.diag){
-    cat("start calculating MCMC convergence diagnostic statistics...\n")
+    cat("Start calculating MCMC convergence diagnostic statistics...\n")
     conv.out<-gelman.diag(jags.out,multivariate=FALSE)
     conv.out<-conv.out$psrf
     if(is.element("rank.prob",param)){
@@ -248,7 +213,7 @@ function(s.id,t.id,event.n,py,data,trtname,param=c("lograte","logratio","rank.pr
   }
 
   if(dic){
-    cat("start calculating deviance information criterion statistics...\n")
+    cat("Start calculating deviance information criterion statistics...\n")
     dic.out<-dic.samples(model=jags.m,n.iter=n.iter,thin=n.thin)
     dev<-sum(dic.out$deviance)
     pen<-sum(dic.out$penalty)
@@ -263,8 +228,8 @@ function(s.id,t.id,event.n,py,data,trtname,param=c("lograte","logratio","rank.pr
     out$mcmc.samples<-jags.out
   }
 
-  if(!all(trace=="")){
-    cat("start saving trace plots...\n")
+  if(!is.null(trace)){
+    cat("Start saving trace plots...\n")
   }
 
   if(is.element("rate",trace)){
@@ -321,7 +286,7 @@ function(s.id,t.id,event.n,py,data,trtname,param=c("lograte","logratio","rank.pr
   }
 
   if(postdens){
-    cat("start saving posterior density plot for log rate...\n")
+    cat("Start saving posterior density plot for log rate...\n")
     mcmc<-NULL
     dens<-matrix(0,ntrt,3)
     colnames(dens)<-c("ymax","xmin","xmax")
@@ -339,14 +304,15 @@ function(s.id,t.id,event.n,py,data,trtname,param=c("lograte","logratio","rank.pr
     xmax<-max(dens[,"xmax"])
     cols<-rainbow(ntrt,s=1,v=0.6)
     pdf("LogRateDensityPlot.pdf")
-    par(mfrow=c(1,1))
-    plot(density(mcmc[[1]]),xlim=c(xmin,xmax),ylim=c(0,ymax),xlab="Log Rate",ylab="Density",main="",col=cols[1],lty=1,lwd=2)
+    par(mfrow=c(1,1),mar=c(5.5,5.5,2,2)+0.1)
+    plot(density(mcmc[[1]]),xlim=c(xmin,xmax),ylim=c(0,ymax),xlab="Log Rate",ylab="Density",main="",col=cols[1],lty=1,lwd=2,cex.axis=2,cex.lab=2)
     for(i in 2:ntrt){
       lines(density(mcmc[[i]]),col=cols[i],lty=i,lwd=2)
     }
-    legend("topright",legend=trtname,col=cols,lty=1:ntrt)
+    legend("topright",legend=trtname,col=cols,lty=1:ntrt,lwd=2,cex=1.5)
     dev.off()
   }
+  class(out)<-"nma.ab"
   return(out)
   options(warn=0)
 }
