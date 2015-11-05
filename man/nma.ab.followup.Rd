@@ -120,7 +120,7 @@ Note that the earlier versions (< 4.0.0) of JAGS does not guarantee exact reprod
 }
 
 \seealso{
-\code{\link{nma.ab}}, \code{\link{nma.ab.cont}}, \code{\link{nma.ab.py}}
+\code{\link{nma.ab.bin}}, \code{\link{nma.ab.cont}}, \code{\link{nma.ab.py}}
 }
 \examples{
 #data(diabetes)

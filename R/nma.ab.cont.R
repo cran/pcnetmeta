@@ -20,14 +20,25 @@ function(s.id,t.id,mean,sd,total.n,data,trtname,param=c("mu","diff","rank.prob")
   if(!all(total.n%%1==0)) warning("at least one event number or total number is not integer.")
   if(!is.element(model,c("hom_eqcor","het_eqcor","het_cor"))) stop("model should be specified as \"hom_eqcor\", \"het_eqcor\", or \"het_cor\".")
 
-  if(any(is.na(s.id))|any(is.na(t.id))|any(is.na(mean))|any(is.na(sd))){
-    stop("NA is not allowed in the input data set;\n  the rows containing NA should be removed.")
+  if(any(is.na(s.id))|any(is.na(t.id))|any(is.na(mean))|any(is.na(sd))|any(is.na(total.n))){
+    dat<-cbind(s.id,t.id,mean,sd,total.n)
+    s.id<-s.id[complete.cases(dat)]
+    t.id<-t.id[complete.cases(dat)]
+    mean<-mean[complete.cases(dat)]
+    sd<-sd[complete.cases(dat)]
+    total.n<-total.n[complete.cases(dat)]
+    cat("NA is not allowed in the input data set;\n")
+    cat("the rows containing NA are removed.\n")
   }
-  if(any(sd<0)) stop("at least one sd is negative.")
-  if(any(sd==0)){
-    cat("At least one sd is 0, which is unrealistic in meta-analysis.\n")
-    cat("Zero sd will be treated as 1e-6 in this function.\n")
-    sd[sd==0]<-1e-6
+
+  if(any(sd<=0)){
+    s.id<-s.id[sd>0]
+    t.id<-t.id[sd>0]
+    mean<-mean[sd>0]
+    total.n<-total.n[sd>0]
+    sd<-sd[sd>0]
+    cat("At least one sd is smaller than or equal to 0;\n")
+    cat("the rows containing sd <= 0 are removed.\n")
   }
 
   ## make ids continuous

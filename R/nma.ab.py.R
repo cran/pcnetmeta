@@ -19,7 +19,13 @@ function(s.id,t.id,event.n,py,data,trtname,param=c("lograte","logratio","rank.pr
   if(!is.element(model,c("hom_eqcor","het_eqcor","het_cor"))) stop("model should be specified as \"hom_eqcor\", \"het_eqcor\", or \"het_cor\".")
 
   if(any(is.na(s.id))|any(is.na(t.id))|any(is.na(event.n))|any(is.na(py))){
-    stop("NA is not allowed in the input data set;\n  the rows containing NA should be removed.")
+    dat<-cbind(s.id,t.id,event.n,py)
+    s.id<-s.id[complete.cases(dat)]
+    t.id<-t.id[complete.cases(dat)]
+    event.n<-event.n[complete.cases(dat)]
+    py<-py[complete.cases(dat)]
+    cat("NA is not allowed in the input data set;\n")
+    cat("the rows containing NA are removed.\n")
   }
 
   ## make ids continuous

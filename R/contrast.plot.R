@@ -1,4 +1,4 @@
-contrast.plot <- function(nma.obj,effect.size,reference,digits=2,width=5,height){
+contrast.plot <- function(nma.obj,effect.size,reference,digits=2,width=5,height,network.name){
   if(missing(nma.obj)) stop("nma.obj is not specified.")
   if(missing(effect.size)){
     if(!is.null(nma.obj$OddsRatio) | !is.null(nma.obj$LogOddsRatio)){
@@ -189,14 +189,18 @@ contrast.plot <- function(nma.obj,effect.size,reference,digits=2,width=5,height)
     logscale<-TRUE
   }
 
-
   med.print<-format(round(med,digits=digits),nsmall=digits)
   low.print<-format(round(low,digits=digits),nsmall=digits)
   upp.print<-format(round(upp,digits=digits),nsmall=digits)
   cis<-paste(med.print," (",low.print,", ",upp.print,")",sep="")
 
   if(missing(height)) height<-ntrt-1
-  pdf(paste("ContrastPlot_",effect.size,".pdf",sep=""),width=width,height=height)
+  if(missing(network.name)){
+    filename<-paste("ContrastPlot_",effect.size,".pdf",sep="")
+  }else{
+    filename<-paste(network.name,"_ContrastPlot_",effect.size,".pdf",sep="")
+  }
+  pdf(filename,width=width,height=height)
   par(mfrow=c(1,1),mai=c(0.5,max(strwidth(contrast.name,"inches"))+0.1,0.1,max(strwidth(cis,"inches"))+0.1),mgp=c(1.5,0.5,0))
   if(logscale){
     plot(x=c(low,upp,nullval),y=c(rep(rev(1:(ntrt-1)),2),1),ylim=c(0.8,ntrt-1),log="x",frame.plot=FALSE,yaxt="n",xlab=efname,ylab="",cex=0.1,col="white")

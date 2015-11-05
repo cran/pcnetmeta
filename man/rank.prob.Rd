@@ -11,7 +11,7 @@ rank.prob(nma.obj, cex.axis = 1, cex.lab = 1)
 }
 \arguments{
   \item{nma.obj}{
-  a list object obtained by function \code{\link{nma.ab}}, \code{\link{nma.ab.cont}}, \code{\link{nma.ab.py}}, or \code{\link{nma.ab.followup}}.
+  a list object obtained by function \code{\link{nma.ab.bin}}, \code{\link{nma.ab.cont}}, \code{\link{nma.ab.py}}, or \code{\link{nma.ab.followup}}.
 }
   \item{cex.axis}{
   a numeric value specifying the size of the tick label numbers/text.
@@ -29,7 +29,7 @@ data(smoke)
 # increase n.iter to reach convergence
 # increase n.adapt to enhance efficiency
 set.seed(1234)
-nma.out <- nma.ab(s.id, t.id, r, n, data = smoke,
+nma.out <- nma.ab.bin(s.id, t.id, r, n, data = smoke,
   trtname = c("NC", "SH", "IC", "GC"), param= "rank.prob", model = "het_cor",
   higher.better = TRUE, n.adapt = 400, n.iter = 100, n.chains = 1)
 rank.prob(nma.out)

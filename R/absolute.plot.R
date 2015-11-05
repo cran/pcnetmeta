@@ -1,4 +1,4 @@
-absolute.plot <- function(nma.obj,alphabetic=TRUE,digits=2,width=5,height){
+absolute.plot <- function(nma.obj,alphabetic=TRUE,digits=2,width=5,height,network.name){
   if(!is.null(nma.obj$AbsoluteRisk)){
     ci<-nma.obj$AbsoluteRisk$Median_CI
     armparam<-"Absolute Risk"
@@ -40,7 +40,12 @@ absolute.plot <- function(nma.obj,alphabetic=TRUE,digits=2,width=5,height){
   cis<-paste(med.print," (",low.print,", ",upp.print,")",sep="")
 
   if(missing(height)) height<-ntrt-1
-  pdf(paste("AbsolutePlot_",armparam,".pdf",sep=""),width=width,height=height)
+  if(missing(network.name)){
+    filename<-paste("AbsolutePlot_",armparam,".pdf",sep="")
+  }else{
+    filename<-paste(network.name,"_AbsolutePlot_",armparam,".pdf",sep="")
+  }
+  pdf(filename,width=width,height=height)
   par(mfrow=c(1,1),mai=c(0.5,max(strwidth(trtname,"inches"))+0.1,0.1,max(strwidth(cis,"inches"))+0.1),mgp=c(1.5,0.5,0))
   plot(x=c(low,upp),y=rep(rev(1:ntrt),2),ylim=c(0.8,ntrt),frame.plot=FALSE,yaxt="n",xlab=armparam,ylab="",cex=0.1,col="white")
   points(med,rev(1:ntrt),pch=15)
