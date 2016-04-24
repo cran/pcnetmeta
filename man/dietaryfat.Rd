@@ -22,6 +22,6 @@ An example of network meta-analysis for binary outcomes with exposure times in p
 This network meta-analysis is collected by Hooper et al (2000) to assess the effects of change in dietary fats on cardiovascular mortality. Treatment 1 is a control diet and treatment 2 is a reduced fat diet. The original study 2 compares three treatments, which include treatment 1 and 2, and another diet. Here, we treat the two different types of diet as the same treatment, but keep the treatment arms separate.
 }
 \source{
-Hooper L et al (2000). "Reduced or modified dietary fat for preventing cardiovascular disease." \emph{The Cochrane Library}
+Hooper L, Summerbell CD, Higgins JPT, Thompson RL, Clements G, Capps N, Davey Smith G, Riemersma R, and Ebrahim S (2000). "Reduced or modified dietary fat for preventing cardiovascular disease." \emph{The Cochrane Database of Systematic Reviews}.
 }
 \keyword{datasets}

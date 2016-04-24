@@ -22,6 +22,6 @@ An example of network meta-analysis for continuous outcomes.
 The continuous outcome measures the off-time reduction in patients given dopamine agonists as adjunct therapy in Parkinson's disease. Treatment 1 is placebo and Treatments 2 to 5 are active drugs.
 }
 \source{
-Dias S, Sutton AJ, Ades AE, and Welton NJ (2013). "Evidence synthesis for decision making 2: A generalized linear modeling framework for pairwise and network meta-analysis of randomized controlled trials." \emph{Med Decis Making} \bold{33}(5), 607--617.
+Dias S, Sutton AJ, Ades AE, and Welton NJ (2013). "Evidence synthesis for decision making 2: A generalized linear modeling framework for pairwise and network meta-analysis of randomized controlled trials." \emph{Med Decis Making} \bold{33}(5), 607--17.
 }
 \keyword{datasets}

@@ -23,11 +23,11 @@ Lifeng Lin, Jing Zhang, and Haitao Chu
 Maintainer: Lifeng Lin <linl@umn.edu>
 }
 \references{
-Dias S, Sutton AJ, Ades AE, and Welton NJ (2013). "Evidence synthesis for decision making 2: A generalized linear modeling framework for pairwise and network meta-analysis of randomized controlled trials." \emph{Med Decis Making} \bold{33}(5), 607--617.
+Dias S, Sutton AJ, Ades AE, and Welton NJ (2013). "Evidence synthesis for decision making 2: A generalized linear modeling framework for pairwise and network meta-analysis of randomized controlled trials." \emph{Med Decis Making} \bold{33}(5), 607--17.
 
-Lu G, Ades AE (2004). "Combination of direct and indirect evidence in mixed treatment comparisons." \emph{Stat Med} \bold{23}(20), 3105--24.
+Lu G and Ades AE (2004). "Combination of direct and indirect evidence in mixed treatment comparisons." \emph{Stat Med} \bold{23}(20), 3105--24.
 
-Salanti G, Higgins JP, Ades AE, and Ioannidis JP (2008). "Evaluation of networks of randomized trials." \emph{Stat Methods Med Res} \bold{17}(3), 279--301.
+Salanti G, Higgins JP, Ades AE, and Ioannidis JPA (2008). "Evaluation of networks of randomized trials." \emph{Stat Methods Med Res} \bold{17}(3), 279--301.
 
-Zhang J, Carlin BP, Neaton JD, Soon GG, Nie L, Kane R, Virnig BA, Chu H (2014). "Network meta-analysis of randomized clinical trials: Reporting the proper summaries." \emph{Clin Trials} \bold{11}(2), 246--262.
+Zhang J, Carlin BP, Neaton JD, Soon GG, Nie L, Kane R, Virnig BA, and Chu H (2014). "Network meta-analysis of randomized clinical trials: Reporting the proper summaries." \emph{Clin Trials} \bold{11}(2), 246--62.
 }

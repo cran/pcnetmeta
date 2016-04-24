@@ -22,6 +22,6 @@ An example of network meta-analysis for binary outcomes with follow-up times rep
 This network meta-analysis is studied by Elliott and Meyer (2007) to assess the effects of anti-hypertensive agents on incident diabetes. Treatment IDs represent 1) diuretic; 2) placebo; 3) \eqn{\beta}-blocker; 4) CCB; 5) ACE inhibitor; and 6) ARB.
 }
 \source{
-Elliott WJ and Meyer PM (2007). "Incident diabetes in clinical trials of antihypertensive drugs: a network meta-analysis." \emph{The Lancet} \bold{369}(9557), 201--207.
+Elliott WJ and Meyer PM (2007). "Incident diabetes in clinical trials of antihypertensive drugs: a network meta-analysis." \emph{Lancet} \bold{369}(9557), 201--7.
 }
 \keyword{datasets}

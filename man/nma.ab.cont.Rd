@@ -45,7 +45,7 @@ nma.ab.cont(s.id, t.id, mean, sd, total.n, data, trtname,
   a character string indicating which Bayesian hierarchical model to be applied in the arm-based network meta-analysis. This argument can be set as \code{"hom_eqcor"}, \code{"het_eqcor"}, or \code{"het_cor"} (default). See "Details" for the models.
 }
   \item{prior.type}{
-  prior distribution of variances/covariances of random effects. If \code{model} is \code{"hom_eqcor"} or \code{"het_eqcor"}, it can be set as \code{"unif"} (uniform prior for standard deviation, the default) or \code{"invgamma"} (inverse gamma prior for variances). If \code{model} is \code{"het_cor"}, \code{prior.type} is automatically set as \code{"invwishart"} to yield an inverse-Wishart prior for the variance-covariance matrix of random effects. See "Details".
+  prior distribution of variances/covariances of random effects. If \code{model} is \code{"hom_eqcor"} or \code{"het_eqcor"}, it can be set as \code{"unif"} (uniform prior for standard deviations, the default) or \code{"invgamma"} (inverse gamma prior for variances). If \code{model} is \code{"het_cor"}, \code{prior.type} can be \code{"invwishart"} (the default) or \code{"chol"}. Specifying \code{"invwishart"} yields an inverse-Wishart prior for the variance-covariance matrix of random effects; by specifying \code{"chol"}, non-informative priors are assigned to variance and correlation components using the separation strategy by Cholesky decomposition. See "Details".
 }
   \item{a, b}{
   positive numbers, specifying the shape and scale parameters of inverse gamma priors for variance(s) of random effects if using \code{prior.type} as \code{"invgamma"} for model \code{"hom_eqcor"} or \code{"het_eqcor"}. The defaults for both parameters are 0.001.
@@ -95,23 +95,29 @@ Suppose that a network meta-analysis collects \eqn{I} studies on \eqn{K} treatme
 \deqn{\bar{y}_{ik} \sim N (\theta_{ik}, s^{2}_{ik}/n_{ik}) \qquad k \in T_{i}}
 \deqn{\theta_{ik} = \mu_{k} + \nu_{ik}}
 \deqn{(\nu_{i1}, \nu_{i2}, \ldots, \nu_{iK})^{T} \sim N (\boldsymbol{0}, \mathbf{\Sigma}_{K}),}
-where \eqn{\mathbf{\Sigma}_{K}} is a \eqn{K \times K} positive definite correlation matrix. \eqn{\mu_{k}}'s are treatment-specific fixed effects, and random effects \eqn{\nu_{ik}}'s are correlated within each study with the covariance matrix \eqn{\mathbf{\Sigma}_{K}}.
+where \eqn{\mathbf{\Sigma}_{K}} is a \eqn{K \times K} positive definite correlation matrix. The \eqn{\mu_{k}}'s are treatment-specific fixed effects, and the random effects \eqn{\nu_{ik}} are correlated within each study with the covariance matrix \eqn{\mathbf{\Sigma}_{K}}.
 
-Using an inverse-Wishart prior for \eqn{\mathbf{\Sigma}_{K}}, the above model corresponds to \code{model} = \code{"het_cor"}. Denote \eqn{\sigma_{k}} as the standard deviation of \eqn{\nu_{ik}} and \eqn{\mathbf{D} = diag(\sigma_{1}, \ldots, \sigma_{K})}, then the correlation matrix \eqn{\mathbf{R}_{K} = \mathbf{D}^{-1} \mathbf{\Sigma}_{K} \mathbf{D}^{-1}}.  If we assume that all of the off-diagonal elements in \eqn{\mathbf{R}_{K}} are equal, say to \eqn{\rho}, then this model corresponds to \code{model} = \code{"het_eqcor"}. If we further assume the homogeneity of variances of the random effects, that is, \eqn{\sigma_{k} = \sigma} for \eqn{k = 1, 2, \ldots, K}, then the model is \code{"hom_eqcor"}. In addition, for the models \code{"hom_eqcor"} and \code{"het_eqcor"}, setting \code{prior.type} as \code{"invgamma"} implies using inverse-gamma priors with shape and scale parameters \eqn{a, b} for \eqn{\sigma_{k}^2} or \eqn{\sigma^2}, and \code{"unif"} implies uniform priors \eqn{U(0, c)} for \eqn{\sigma_{k}} or \eqn{\sigma}.
+An unstructured covariance matrix \eqn{\mathbf{\Sigma}_{K}} in the above model corresponds to \code{model} = \code{"het_cor"}. The inverse-Wishart prior can be assigned to \eqn{\mathbf{\Sigma}_{K}}. Alternatively, using the separation strategy by Cholesky decomposition (\code{prior.type} = \code{"chol"}), uniform priors \eqn{U(0, c)} are assigned to the standard deviations in \eqn{\mathbf{\Sigma}_{K}} and non-informative priors are assigned to the correlation components (Barnard et al, 2000; Lu and Ades, 2009; Wei and Higgins, 2013). Denote \eqn{\sigma_{k}} as the standard deviation of \eqn{\nu_{ik}} and \eqn{\mathbf{D} = diag(\sigma_{1}, \ldots, \sigma_{K})}, then the correlation matrix \eqn{\mathbf{R}_{K} = \mathbf{D}^{-1} \mathbf{\Sigma}_{K} \mathbf{D}^{-1}}.  If we assume that all of the off-diagonal elements in \eqn{\mathbf{R}_{K}} are equal, say to \eqn{\rho}, then this model corresponds to \code{model} = \code{"het_eqcor"}. If we further assume the homogeneity of variances of the random effects, that is, \eqn{\sigma_{k} = \sigma} for \eqn{k = 1, 2, \ldots, K}, then the model is \code{"hom_eqcor"}. In addition, for the models \code{"hom_eqcor"} and \code{"het_eqcor"}, setting \code{prior.type} as \code{"invgamma"} implies using inverse-gamma priors with shape and scale parameters \eqn{a, b} for \eqn{\sigma_{k}^2} or \eqn{\sigma^2}, and \code{"unif"} implies uniform priors \eqn{U(0, c)} for \eqn{\sigma_{k}} or \eqn{\sigma}.
 }
 \value{
 \code{nma.ab.cont} returns a list with estimates of effect sizes specified in \code{param}. If the argument \code{dic} = \code{TRUE}, the deviance information criterion (DIC) statistic will be returned in the output list. In addition, if \code{conv.diag} = \code{TRUE}, a .txt file containing the point estimates of the potential scale reduction factor and their upper confidence limits by Gelman and Rubin (1992) will be saved in users' current working directory. If \code{postdens} = \code{TRUE}, the posterior densities of treatment-specific absolute risks will be saved as a .pdf file. If \code{trace} is specified, the trace plots are saved as .png files.
 }
 \references{
-Dias S, Sutton AJ, Ades AE, and Welton NJ (2013). "Evidence synthesis for decision making 2: A generalized linear modeling framework for pairwise and network meta-analysis of randomized controlled trials." \emph{Med Decis Making} \bold{33}(5), 607--617.
+Barnard J, McCulloch R, and Meng XL (2000). "Modeling covariance matrices in terms of standard deviations and correlations, with application to shrinkage." \emph{Stat Sin} \bold{10}(4), 1281--11.
 
-Gelman A and Rubin, DB (1992). "Inference from iterative simulation using multiple sequences." \emph{Stat Sci} \bold{7}(4), 457--472.
+Dias S, Sutton AJ, Ades AE, and Welton NJ (2013). "Evidence synthesis for decision making 2: A generalized linear modeling framework for pairwise and network meta-analysis of randomized controlled trials." \emph{Med Decis Making} \bold{33}(5), 607--17.
+
+Gelman A and Rubin DB (1992). "Inference from iterative simulation using multiple sequences." \emph{Stat Sci} \bold{7}(4), 457--72.
 
 Lu G and Ades AE (2004). "Combination of direct and indirect evidence in mixed treatment comparisons." \emph{Stat Med} \bold{23}(20), 3105--24.
 
-Spiegelhalter DJ, Best NG, Carlin BP, and Van Der Linde A (2002). "Bayesian measures of model complexity and fit." \emph{J R Stat Soc Series B Stat Methodol} \bold{64}(4), 583--639.
+Lu G and Ades AE (2009). "Modeling between-trial variance structure in mixed treatment comparisons." \emph{Biostatistics}, \bold{10}(4), 792--805.
 
-Zhang J, Carlin BP, Neaton JD, Soon GG, Nie L, Kane R, Virnig BA, Chu H (2014). "Network meta-analysis of randomized clinical trials: Reporting the proper summaries." \emph{Clin Trials} \bold{11}(2), 246--62.
+Spiegelhalter DJ, Best NG, Carlin BP, and van der Linde A (2002). "Bayesian measures of model complexity and fit." \emph{J R Stat Soc Series B Stat Methodol} \bold{64}(4), 583--639.
+
+Wei Y and Higgins JPT (2013). "Bayesian multivariate meta-analysis with multiple outcomes." \emph{Stat Med} \bold{32}(17), 2911--34.
+
+Zhang J, Carlin BP, Neaton JD, Soon GG, Nie L, Kane R, Virnig BA, and Chu H (2014). "Network meta-analysis of randomized clinical trials: Reporting the proper summaries." \emph{Clin Trials} \bold{11}(2), 246--62.
 }
 
 \note{

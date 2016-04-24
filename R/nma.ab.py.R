@@ -56,7 +56,6 @@ function(s.id,t.id,event.n,py,data,trtname,param=c("lograte","logratio","rank.pr
     modelstring<-model.py.het.eqcor(prior.type,is.element("rank.prob",param))
   }
   if(model=="het_cor"){
-    I <- diag(ntrt)
     modelstring<-model.py.het.cor(prior.type,is.element("rank.prob",param))
   }
 
@@ -72,8 +71,15 @@ function(s.id,t.id,event.n,py,data,trtname,param=c("lograte","logratio","rank.pr
     }
   }
   if(model=="het_cor"){
-    if(is.element("rank.prob",param)) data.jags<-list(s=s.id,t=t.id,y=event.n,py=py,len=len,nstudy=nstudy,ntrt=ntrt,zeros=rep(0,ntrt),I=I,higher.better=higher.better)
-    if(!is.element("rank.prob",param)) data.jags<-list(s=s.id,t=t.id,y=event.n,py=py,len=len,nstudy=nstudy,ntrt=ntrt,zeros=rep(0,ntrt),I=I)
+    if(prior.type == "invwishart"){
+      I <- diag(ntrt)
+      if(is.element("rank.prob",param)) data.jags<-list(s=s.id,t=t.id,y=event.n,py=py,len=len,nstudy=nstudy,ntrt=ntrt,zeros=rep(0,ntrt),I=I,higher.better=higher.better)
+      if(!is.element("rank.prob",param)) data.jags<-list(s=s.id,t=t.id,y=event.n,py=py,len=len,nstudy=nstudy,ntrt=ntrt,zeros=rep(0,ntrt),I=I)
+    }
+    if(prior.type == "chol"){
+      if(is.element("rank.prob",param)) data.jags<-list(s=s.id,t=t.id,y=event.n,py=py,len=len,nstudy=nstudy,ntrt=ntrt,zeros=rep(0,ntrt),c=c,higher.better=higher.better)
+      if(!is.element("rank.prob",param)) data.jags<-list(s=s.id,t=t.id,y=event.n,py=py,len=len,nstudy=nstudy,ntrt=ntrt,zeros=rep(0,ntrt),c=c)
+    }
   }
 
   ## jags initial value
@@ -108,8 +114,13 @@ function(s.id,t.id,event.n,py,data,trtname,param=c("lograte","logratio","rank.pr
     }
   }
   if(model=="het_cor"){
-    for(ii in 1:n.chains){
-      init.jags[[ii]]<-list(mu=mu.init,vi=matrix(0,nstudy,ntrt),T=(ntrt+1)*I,.RNG.name="base::Wichmann-Hill",.RNG.seed=rng.seeds[ii])
+    if(prior.type=="invwishart"){
+      for(ii in 1:n.chains){
+        init.jags[[ii]]<-list(mu=mu.init,vi=matrix(0,nstudy,ntrt),T=(ntrt+1)*I,.RNG.name="base::Wichmann-Hill",.RNG.seed=rng.seeds[ii])
+      }
+    }
+    if(prior.type=="chol"){
+        init.jags[[ii]]<-list(mu=mu.init,vi=matrix(0,nstudy,ntrt),sigma=rep(c/2,ntrt),psi=matrix(3.1415926/2,ntrt-1,ntrt-1),.RNG.name="base::Wichmann-Hill",.RNG.seed=rng.seeds[ii])
     }
   }
 
@@ -136,7 +147,10 @@ function(s.id,t.id,event.n,py,data,trtname,param=c("lograte","logratio","rank.pr
 
   ## run jags
   cat("Start running MCMC...\n")
-  jags.m<-jags.model(file=textConnection(modelstring),data=data.jags,inits=init.jags,n.chains=n.chains,n.adapt=n.adapt)
+  jags.m<-tryCatch.W.E(jags.model(file=textConnection(modelstring),data=data.jags,inits=init.jags,n.chains=n.chains,n.adapt=n.adapt))
+  warn.adapt<-jags.m$warning
+  jags.m<-jags.m$value
+  if(is(warn.adapt,"warning")) cat("Adaptation incomplete; users may increase n.adapt.\n")
   update(jags.m,n.iter=n.burnin)
   jags.out<-coda.samples(model=jags.m,variable.names=monitor,n.iter=n.iter,thin=n.thin)
   smry<-summary(jags.out)
