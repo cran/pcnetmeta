@@ -1,0 +1,25 @@
+bibentry(bibtype = "Article",
+  title        = "Performing Arm-Based Network Meta-Analysis in {R} with the {pcnetmeta} Package",
+  author       = c(person(given = "Lifeng",
+                          family = "Lin"),
+                   person(given = "Jing",
+                          family = "Zhang"),
+                   person(given = c("James", "S."),
+                          family = "Hodges"),
+                   person(given = "Haitao",
+                          family = "Chu")),
+  journal      = "Journal of Statistical Software",
+  year         = "2017",
+  volume       = "80",
+  number       = "5",
+  pages        = "1--25",
+  doi          = "10.18637/jss.v080.i05",
+
+  header       = "To cite pcnetmeta in publications use:",
+  textVersion  =
+  paste("Lifeng Lin, Jing Zhang, James S. Hodges, Haitao Chu (2017).",
+        "Performing Arm-Based Network Meta-Analysis in R with the pcnetmeta Package.",
+        "Journal of Statistical Software, 80(5), 1-25.",
+        "doi:10.18637/jss.v080.i05")
+)
+

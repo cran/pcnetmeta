@@ -20,10 +20,12 @@ Parameter estimation in arm-based Bayesian hierarchical models are performed thr
 \author{
 Lifeng Lin, Jing Zhang, and Haitao Chu
 
-Maintainer: Lifeng Lin <linl@umn.edu>
+Maintainer: Lifeng Lin <linl@stat.fsu.edu>
 }
 \references{
 Dias S, Sutton AJ, Ades AE, and Welton NJ (2013). "Evidence synthesis for decision making 2: A generalized linear modeling framework for pairwise and network meta-analysis of randomized controlled trials." \emph{Med Decis Making} \bold{33}(5), 607--17.
+
+Lin L, Zhang J, Hodges JS, and Chu H (2017). "pcnetmeta: An R package for arm-based network meta-analysis." \emph{J Stat Softw}, \bold{80}(5), 1--25.
 
 Lu G and Ades AE (2004). "Combination of direct and indirect evidence in mixed treatment comparisons." \emph{Stat Med} \bold{23}(20), 3105--24.
 

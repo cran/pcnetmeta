@@ -106,6 +106,8 @@ Dias S, Sutton AJ, Ades AE, and Welton NJ (2013). "Evidence synthesis for decisi
 
 Gelman A and Rubin DB (1992). "Inference from iterative simulation using multiple sequences." \emph{Stat Sci} \bold{7}(4), 457--72.
 
+Lin L, Zhang J, Hodges JS, and Chu H (2017). "pcnetmeta: An R package for arm-based network meta-analysis." \emph{J Stat Softw}, \bold{80}(5), 1--25.
+
 Lu G and Ades AE (2004). "Combination of direct and indirect evidence in mixed treatment comparisons." \emph{Stat Med} \bold{23}(20), 3105--24.
 
 Lu G and Ades AE (2009). "Modeling between-trial variance structure in mixed treatment comparisons." \emph{Biostatistics}, \bold{10}(4), 792--805.

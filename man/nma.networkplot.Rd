@@ -65,6 +65,10 @@ nma.networkplot(s.id, t.id, data, title = "", trtname, alphabetic = TRUE,
 A network plot is generated. Each node represents a treatment, and the edges indicate the direct comparisons between the two treatments in various studies.
 }
 
+\references{
+Lin L, Zhang J, Hodges JS, and Chu H (2017). "pcnetmeta: An R package for arm-based network meta-analysis." \emph{J Stat Softw}, \bold{80}(5), 1--25.
+}
+
 \examples{
 data(smoke)
 nma.networkplot(s.id, t.id, data = smoke, title = "Smoke Cessation",
