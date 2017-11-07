@@ -152,10 +152,7 @@ function(s.id,t.id,event.n,total.n,followup,data,trtname,param=c("lograte","logr
 
   ## run jags
   cat("Start running MCMC...\n")
-  jags.m<-tryCatch.W.E(jags.model(file=textConnection(modelstring),data=data.jags,inits=init.jags,n.chains=n.chains,n.adapt=n.adapt))
-  warn.adapt<-jags.m$warning
-  jags.m<-jags.m$value
-  if(is(warn.adapt,"warning")) cat("Adaptation incomplete; users may increase n.adapt.\n")
+  jags.m<-jags.model(file=textConnection(modelstring),data=data.jags,inits=init.jags,n.chains=n.chains,n.adapt=n.adapt)
   update(jags.m,n.iter=n.burnin)
   jags.out<-coda.samples(model=jags.m,variable.names=monitor,n.iter=n.iter,thin=n.thin)
   smry<-summary(jags.out)

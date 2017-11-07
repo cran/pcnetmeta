@@ -11,7 +11,7 @@ model{
  }
  for(j in 1:ntrt){
   mu[j]~dnorm(0,0.001)
-  sigma[j]~dunif(0,c)
+  sigma[j]~dunif(0.0001,c)
  }
  for(i in 1:ntrt){
   for(j in 1:ntrt){
@@ -25,7 +25,7 @@ model{
  }
  diag<-(1+(ntrt-2)*rho)/(1+(ntrt-2)*rho-(ntrt-1)*rho^2)
  offdiag<-(-rho/(1+(ntrt-2)*rho-(ntrt-1)*rho^2))
- rho~dunif(-1/(ntrt-1),1)
+ rho~dunif(-1/(ntrt-1),0.9999)
  rk[1:ntrt]<-(ntrt+1-rank(mu[]))*ifelse(higher.better,1,0)+(rank(mu[]))*ifelse(higher.better,0,1)
  for(i in 1:ntrt){
   rank.prob[1:ntrt,i]<-equals(rk[],i)
@@ -46,7 +46,7 @@ model{
  }
  for(j in 1:ntrt){
   mu[j]~dnorm(0,0.001)
-  sigma[j]~dunif(0,c)
+  sigma[j]~dunif(0.0001,c)
  }
  for(i in 1:ntrt){
   for(j in 1:ntrt){
@@ -60,7 +60,7 @@ model{
  }
  diag<-(1+(ntrt-2)*rho)/(1+(ntrt-2)*rho-(ntrt-1)*rho^2)
  offdiag<-(-rho/(1+(ntrt-2)*rho-(ntrt-1)*rho^2))
- rho~dunif(-1/(ntrt-1),1)
+ rho~dunif(-1/(ntrt-1),0.9999)
 }
 "
 }
@@ -92,7 +92,7 @@ model{
  }
  diag<-(1+(ntrt-2)*rho)/(1+(ntrt-2)*rho-(ntrt-1)*rho^2)
  offdiag<-(-rho/(1+(ntrt-2)*rho-(ntrt-1)*rho^2))
- rho~dunif(-1/(ntrt-1),1)
+ rho~dunif(-1/(ntrt-1),0.9999)
  rk[1:ntrt]<-(ntrt+1-rank(mu[]))*ifelse(higher.better,1,0)+(rank(mu[]))*ifelse(higher.better,0,1)
  for(i in 1:ntrt){
   rank.prob[1:ntrt,i]<-equals(rk[],i)
@@ -128,7 +128,7 @@ model{
  }
  diag<-(1+(ntrt-2)*rho)/(1+(ntrt-2)*rho-(ntrt-1)*rho^2)
  offdiag<-(-rho/(1+(ntrt-2)*rho-(ntrt-1)*rho^2))
- rho~dunif(-1/(ntrt-1),1)
+ rho~dunif(-1/(ntrt-1),0.9999)
 }
 "
 }

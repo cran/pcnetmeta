@@ -99,11 +99,11 @@ model{
  L[ntrt,ntrt] <- prod(sin(psi[ntrt-1,1:(ntrt-1)]))
  for(i in 1:(ntrt - 1)){
   for(j in 1:(ntrt - 1)){
-   psi[i, j] ~ dunif(0, 3.1415926)
+   psi[i, j] ~ dunif(0.01, 3.13)
   }
  }
  for(i in 1:ntrt){
-  sigma[i] ~ dunif(0, c)
+  sigma[i] ~ dunif(0.0001, c)
  }
  rk[1:ntrt]<-(ntrt+1-rank(mu[]))*ifelse(higher.better,1,0)+(rank(mu[]))*ifelse(higher.better,0,1)
  for(i in 1:ntrt){
@@ -159,11 +159,11 @@ model{
  L[ntrt,ntrt] <- prod(sin(psi[ntrt-1,1:(ntrt-1)]))
  for(i in 1:(ntrt - 1)){
   for(j in 1:(ntrt - 1)){
-   psi[i, j] ~ dunif(0, 3.1415926)
+   psi[i, j] ~ dunif(0.01, 3.13)
   }
  }
  for(i in 1:ntrt){
-  sigma[i] ~ dunif(0, c)
+  sigma[i] ~ dunif(0.0001, c)
  }
 }
 "

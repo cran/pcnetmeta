@@ -13,7 +13,7 @@ model{
   rate[j]<-exp(mu[j]+pow(sigma[j],2)/2)
   lograte[j]<-log(rate[j])
   mu[j]~dnorm(0,0.001)
-  sigma[j]~dunif(0,c)
+  sigma[j]~dunif(0.0001,c)
  }
  for(j in 1:ntrt){
   for(k in 1:ntrt){ 
@@ -22,7 +22,7 @@ model{
  }
  diag<-(1+(ntrt-2)*rho)/(1+(ntrt-2)*rho-(ntrt-1)*rho^2)
  offdiag<-(-rho/(1+(ntrt-2)*rho-(ntrt-1)*rho^2))
- rho~dunif(-1/(ntrt-1),1)
+ rho~dunif(-1/(ntrt-1),0.9999)
  for(j in 1:ntrt){        
   for(k in 1:ntrt){
    ratio[j,k]<-rate[j]/rate[k]
@@ -51,7 +51,7 @@ model{
   rate[j]<-exp(mu[j]+pow(sigma[j],2)/2)
   lograte[j]<-log(rate[j])
   mu[j]~dnorm(0,0.001)
-  sigma[j]~dunif(0,c)
+  sigma[j]~dunif(0.0001,c)
  }
  for(j in 1:ntrt){
   for(k in 1:ntrt){ 
@@ -60,7 +60,7 @@ model{
  }
  diag<-(1+(ntrt-2)*rho)/(1+(ntrt-2)*rho-(ntrt-1)*rho^2)
  offdiag<-(-rho/(1+(ntrt-2)*rho-(ntrt-1)*rho^2))
- rho~dunif(-1/(ntrt-1),1)
+ rho~dunif(-1/(ntrt-1),0.9999)
  for(j in 1:ntrt){        
   for(k in 1:ntrt){
    ratio[j,k]<-rate[j]/rate[k]
@@ -95,7 +95,7 @@ model{
  }
  diag<-(1+(ntrt-2)*rho)/(1+(ntrt-2)*rho-(ntrt-1)*rho^2)
  offdiag<-(-rho/(1+(ntrt-2)*rho-(ntrt-1)*rho^2))
- rho~dunif(-1/(ntrt-1),1)
+ rho~dunif(-1/(ntrt-1),0.9999)
  for(j in 1:ntrt){        
   for(k in 1:ntrt){
    ratio[j,k]<-rate[j]/rate[k]
@@ -134,7 +134,7 @@ model{
  }
  diag<-(1+(ntrt-2)*rho)/(1+(ntrt-2)*rho-(ntrt-1)*rho^2)
  offdiag<-(-rho/(1+(ntrt-2)*rho-(ntrt-1)*rho^2))
- rho~dunif(-1/(ntrt-1),1)
+ rho~dunif(-1/(ntrt-1),0.9999)
  for(j in 1:ntrt){        
   for(k in 1:ntrt){
    ratio[j,k]<-rate[j]/rate[k]
