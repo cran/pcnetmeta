@@ -34,7 +34,7 @@ nma.networkplot(s.id, t.id, n, data, title = "", title.cex = 1, trtname,
   the size of the plot title.
 }
   \item{trtname}{
-  a vector of character strings specifying the treatment names for the corresponding treatment IDs according their order in \code{t.id}. If not specified, \code{t.id} is used as treatment names.
+  a vector of character strings specifying the treatment names for the corresponding treatment IDs according to their order in \code{t.id}. If not specified, \code{t.id} is used as treatment names.
 }
   \item{alphabetic}{
   a logical value indicating whether to sort treatment nodes alphabetically in the network plot. The default is \code{TRUE}. If \code{FALSE}, treatment nodes are sorted by the treatment IDs specified in \code{t.id}.

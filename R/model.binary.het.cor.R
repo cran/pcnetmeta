@@ -5,7 +5,11 @@ model{
  for(i in 1:len){
   p[i] <- phi(mu[t[i]] + vi[s[i], t[i]])
   r[i] ~ dbin(p[i], totaln[i])
+  rhat[i] <- p[i]*totaln[i]
+  dev[i] <- 2*(r[i]*(log(r[i]) - log(rhat[i])) +
+    (totaln[i] - r[i])*(log(totaln[i] - r[i]) - log(totaln[i] - rhat[i])))
  }
+ totresdev <- sum(dev[])
  for(j in 1:nstudy){
   vi[j, 1:ntrt] ~ dmnorm(zeros[1:ntrt], T[1:ntrt, 1:ntrt])
  }
@@ -39,7 +43,11 @@ model{
  for(i in 1:len){
   p[i] <- phi(mu[t[i]] + vi[s[i], t[i]])
   r[i] ~ dbin(p[i], totaln[i])
+  rhat[i] <- p[i]*totaln[i]
+  dev[i] <- 2*(r[i]*(log(r[i]) - log(rhat[i])) +
+    (totaln[i] - r[i])*(log(totaln[i] - r[i]) - log(totaln[i] - rhat[i])))
  }
+ totresdev <- sum(dev[])
  for(j in 1:nstudy){
   vi[j, 1:ntrt] ~ dmnorm(zeros[1:ntrt], T[1:ntrt, 1:ntrt])
  }
@@ -69,7 +77,11 @@ model{
  for(i in 1:len){
   p[i] <- phi(mu[t[i]] + vi[s[i], t[i]])
   r[i] ~ dbin(p[i], totaln[i])
+  rhat[i] <- p[i]*totaln[i]
+  dev[i] <- 2*(r[i]*(log(r[i]) - log(rhat[i])) +
+    (totaln[i] - r[i])*(log(totaln[i] - r[i]) - log(totaln[i] - rhat[i])))
  }
+ totresdev <- sum(dev[])
  for(j in 1:nstudy){
   vi[j, 1:ntrt] ~ dmnorm(zeros[1:ntrt], invSig[1:ntrt, 1:ntrt])
  }
@@ -134,7 +146,11 @@ model{
  for(i in 1:len){
   p[i] <- phi(mu[t[i]] + vi[s[i], t[i]])
   r[i] ~ dbin(p[i], totaln[i])
+  rhat[i] <- p[i]*totaln[i]
+  dev[i] <- 2*(r[i]*(log(r[i]) - log(rhat[i])) +
+    (totaln[i] - r[i])*(log(totaln[i] - r[i]) - log(totaln[i] - rhat[i])))
  }
+ totresdev <- sum(dev[])
  for(j in 1:nstudy){
   vi[j, 1:ntrt] ~ dmnorm(zeros[1:ntrt], invSig[1:ntrt, 1:ntrt])
  }

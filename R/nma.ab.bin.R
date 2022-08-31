@@ -25,11 +25,17 @@ function(s.id, t.id, event.n, total.n, data,trtname, param = c("AR", "LOR", "LRR
   if(!all(event.n %% 1 == 0) | !all(total.n %% 1 == 0)) warning("at least one event number or total number is not integer.")
   if(!is.element(model, c("hom_eqcor", "het_eqcor", "het_cor"))) stop("model should be specified as \"hom_eqcor\", \"het_eqcor\", or \"het_cor\".")
   if(!is.element(link, c("probit", "logit"))) stop("link should be specified as \"probit\" or \"logit\".")
-  if(link == "probit" & any(!is.element(param, c("AR", "OR", "LOR", "RR", "LRR", "RD", "rank.prob")))){
+  if(model == "het_cor" & link == "probit" & any(!is.element(param, c("AR", "OR", "LOR", "RR", "LRR", "RD", "rank.prob")))){
     param <- param[is.element(param, c("AR", "OR", "LOR", "RR", "LRR", "RD", "rank.prob"))]
   }
-  if(link == "logit" & any(!is.element(param, c("AR", "OR", "LOR", "OR.med", "LOR.med", "RR", "LRR", "RD", "rank.prob", "rank.prob.med")))){
+  if(model == "het_cor" & link == "logit" & any(!is.element(param, c("AR", "OR", "LOR", "OR.med", "LOR.med", "RR", "LRR", "RD", "rank.prob", "rank.prob.med")))){
     param <- param[is.element(param, c("AR", "OR", "LOR", "OR.med", "LOR.med", "RR", "LRR", "RD", "rank.prob", "rank.prob.med"))]
+  }
+  if(model != "het_cor" & link == "probit" & any(!is.element(param, c("AR", "OR", "LOR", "RR", "LRR", "RD", "rank.prob", "rho")))){
+    param <- param[is.element(param, c("AR", "OR", "LOR", "RR", "LRR", "RD", "rank.prob", "rho"))]
+  }
+  if(model != "het_cor" & link == "logit" & any(!is.element(param, c("AR", "OR", "LOR", "OR.med", "LOR.med", "RR", "LRR", "RD", "rank.prob", "rank.prob.med", "rho")))){
+    param <- param[is.element(param, c("AR", "OR", "LOR", "OR.med", "LOR.med", "RR", "LRR", "RD", "rank.prob", "rank.prob.med", "rho"))]
   }
 
   if(any(is.na(s.id)) | any(is.na(t.id)) | any(is.na(event.n)) | any(is.na(total.n))){
@@ -207,6 +213,9 @@ function(s.id, t.id, event.n, total.n, data,trtname, param = c("AR", "LOR", "LRR
       }
     }
   }
+  if(dic){
+    monitor <- c(monitor, "totresdev")
+  }
 
   ## run JAGS
   cat("Start running MCMC...\n")
@@ -215,6 +224,9 @@ function(s.id, t.id, event.n, total.n, data,trtname, param = c("AR", "LOR", "LRR
   jags.out <- coda.samples(model = jags.m, variable.names = monitor, n.iter = n.iter, thin = n.thin)
   smry <- summary(jags.out)
   smry <- cbind(smry$statistics[,c("Mean", "SD")], smry$quantiles[,c("2.5%", "50%", "97.5%")])
+  if(dic){
+    dev <- smry["totresdev", "Mean"]
+  }
   smry <- signif(smry, digits = digits)
 
   out <- NULL
@@ -391,7 +403,7 @@ function(s.id, t.id, event.n, total.n, data,trtname, param = c("AR", "LOR", "LRR
   if(dic){
     cat("Start calculating deviance information criterion statistics...\n")
     dic.out <- dic.samples(model = jags.m, n.iter = n.iter, thin = n.thin)
-    dev <- sum(dic.out$deviance)
+    #dev <- sum(dic.out$deviance)
     pen <- sum(dic.out$penalty)
     pen.dev <- dev + pen
     dic.stat <- rbind(dev, pen, pen.dev)
